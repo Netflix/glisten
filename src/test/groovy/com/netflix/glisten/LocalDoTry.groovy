@@ -50,7 +50,7 @@ class LocalDoTry implements DoTry {
 
     @Override
     DoTry withFinally(Closure doFinallyBlock) {
-        doFinallyBlock(result.get())
+        doFinallyBlock(result?.get())
         if (error) {
             throw error
         }
