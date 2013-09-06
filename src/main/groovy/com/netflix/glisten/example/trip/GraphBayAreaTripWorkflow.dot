@@ -1,0 +1,67 @@
+digraph bayAreaTrip {
+    start [label = "Start"]
+    beenToBridge [label = "Been to the Golden Gate Bridge?" shape=diamond]
+    beenToRedwoods [label = "Seen redwoods?" shape=diamond]
+    isThrillSeeker [label = "Like roller coasters?" shape=diamond color=blue]
+
+    gotoToBridge [label = "Go to the Golden Gate Bridge" color=blue]
+    gotoToRedwoods [label = "Go to Muir Woods" color=blue]
+    gotoToBoardwalk [label = "Go to the Santa Cruz Boardwalk" color=blue]
+    gotoToMonterey [label = "Go to Monterey Bay" color=blue]
+
+    start -> beenToBridge
+    beenToBridge -> gotoToBridge [label = "No"]
+    beenToBridge -> beenToRedwoods [label = "Yes"]
+    beenToRedwoods -> gotoToRedwoods [label = "No"]
+    beenToRedwoods -> isThrillSeeker [label = "Yes"]
+    isThrillSeeker -> gotoToMonterey [label = "No"]
+    isThrillSeeker -> gotoToBoardwalk [label = "Yes"]
+
+    subgraph clusterBridge {
+        hikeBridge [label = "Hike across the bridge" color=blue]
+        gotoToBridge -> hikeBridge
+    }
+
+    subgraph clusterRedwoods {
+        stretch [label = "Wait to stretch" color=green]
+        countDown [label = "Out of time" color=green]
+        hikeRedwood [label = "Hike through redwoods" color=blue]
+        hikedone [label = "Any" shape=rectangle]
+        gotoToRedwoods -> stretch
+        stretch -> hikeRedwood
+        stretch -> countDown
+        hikeRedwood -> hikedone
+        countDown -> hikedone
+    }
+
+    subgraph clusterMonterey {
+        eatSeafood [label = "Eat seafood" color=blue]
+        watchSeaLions [label = "Watch sea lions" color=blue]
+        doneEating [label = "All" shape=rectangle]
+        lookSeaGlass [label = "Try the beach" color=blue]
+        aquarium [label = "Aquarium" color=blue]
+        drive [label = "17-Mile Drive (finally)" color=blue]
+        rain [label = "Rain" shape=hexagon color=red]
+        gotoToMonterey -> eatSeafood
+        gotoToMonterey -> watchSeaLions
+        eatSeafood -> doneEating
+        watchSeaLions -> doneEating
+        doneEating -> lookSeaGlass
+        lookSeaGlass -> drive
+        lookSeaGlass -> rain [color=red]
+        rain -> aquarium [color=red]
+        aquarium -> drive
+    }
+
+    subgraph clusterBoardwalk {
+        win [label = "Try to win game" color=blue]
+        rollerCoaster [label = "Ride roller coaster" color=blue]
+        haveTokens [label = "Still have tokens" shape=diamond]
+        lost [label = "Lost" shape=hexagon color=red]
+        gotoToBoardwalk -> win
+        win -> lost [color=red]
+        lost -> win [color=red]
+        win -> haveTokens [label = "Win"]
+        haveTokens -> rollerCoaster [label = "Yes"]
+    }
+}
