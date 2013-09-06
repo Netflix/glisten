@@ -17,7 +17,6 @@ package com.netflix.glisten
 
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.core.Settable
-import com.netflix.glisten.DoTry
 
 /**
  * Local implementation sufficient to run unit tests without a real SWF dependency.
@@ -51,7 +50,7 @@ class LocalDoTry implements DoTry {
 
     @Override
     DoTry withFinally(Closure doFinallyBlock) {
-        doFinallyBlock()
+        doFinallyBlock(result.get())
         if (error) {
             throw error
         }

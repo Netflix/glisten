@@ -15,6 +15,7 @@
  */
 package com.netflix.glisten
 
+import com.amazonaws.services.simpleworkflow.flow.core.Functor
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.core.Settable
 import com.amazonaws.services.simpleworkflow.flow.core.TryCatchFinally
@@ -98,6 +99,11 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
 
     @Override
     protected void doFinally() throws Throwable {
-        finallyBlock()
+        new Functor([result] as Promise[]) {
+            @Override
+            protected Promise doExecute() {
+                finallyBlock(result.get())
+            }
+        }
     }
 }

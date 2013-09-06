@@ -34,7 +34,7 @@ interface DoTry<T> {
     /**
      * Provide logic to perform in the case of an exception.
      *
-     * @param block executed for exception should take a Throwable
+     * @param block executed for exception should take a Throwable and return a Promise<T> for a stand in result
      * @return this object with catch logic implemented
      */
     DoTry<T> withCatch(Closure<? extends Promise<T>> block)
@@ -42,7 +42,7 @@ interface DoTry<T> {
     /**
      * Provide logic guaranteed to be performed once the work is done (even in the case of an exception).
      *
-     * @param block executed for finally should take not arguments
+     * @param block executed for finally can take a T which is the result of the try
      * @return this object with finally logic implemented
      */
     DoTry<T> withFinally(Closure block)
