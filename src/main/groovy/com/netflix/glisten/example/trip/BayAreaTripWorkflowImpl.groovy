@@ -84,15 +84,16 @@ class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
                         Promise<String> watching = promiseFor(activities.enjoy('watching sea lions'))
                         waitFor(allPromises(eating, watching)) {
                             status "${eating.get()} ${watching.get()}"
-                            DoTry<String> tryToEnjoySomething = doTry {
-                                waitFor(activities.enjoy('looking for sea glass on the beach')) { status it }
+                            doTry {
+                                promiseFor(activities.enjoy('looking for sea glass on the beach'))
                             } withCatch { Throwable t ->
                                 status t.message
-                                waitFor(activities.enjoy('the aquarium')) { status it }
-                            } withFinally {
+                                promiseFor(activities.enjoy('the aquarium'))
+                            } withFinally { String result ->
+                                status result
                                 waitFor(activities.enjoy('the 17-Mile Drive')) { status it }
                             }
-                            tryToEnjoySomething.result
+                            Promise.Void()
                         }
                         break
 
