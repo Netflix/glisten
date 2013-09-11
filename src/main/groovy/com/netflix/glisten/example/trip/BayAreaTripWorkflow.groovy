@@ -28,7 +28,7 @@ public interface BayAreaTripWorkflow {
      * status messages.
      * @see com.amazonaws.services.simpleworkflow.model.DecisionTaskCompletedEventAttributes#executionContext
      * @see com.netflix.glisten.HistoryAnalyzer#getLogMessages()
-     * @see com.netflix.glisten.Workflow#logHistory
+     * @see com.netflix.glisten.WorkflowOperations#logHistory
      *
      * @return workflow status
      */

@@ -25,12 +25,12 @@ import groovy.transform.Canonical
  * Local implementation sufficient to run unit tests without a real SWF dependency.
  */
 @Canonical
-class LocalWorkflow<A> extends Workflow<A> {
+class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
 
     final A activities
 
-    static <T> LocalWorkflow<T> of(T activities) {
-        new LocalWorkflow<T>(activities)
+    static <T> LocalWorkflowOperations<T> of(T activities) {
+        new LocalWorkflowOperations<T>(activities)
     }
 
     @Override

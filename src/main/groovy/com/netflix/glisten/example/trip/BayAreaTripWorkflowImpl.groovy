@@ -19,15 +19,16 @@ import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.interceptors.ExponentialRetryPolicy
 import com.amazonaws.services.simpleworkflow.flow.interceptors.RetryPolicy
 import com.netflix.glisten.DoTry
-import com.netflix.glisten.SwfWorkflow
-import com.netflix.glisten.Workflow
+import com.netflix.glisten.SwfWorkflowOperations
+import com.netflix.glisten.WorkflowOperations
 
 /**
  * SWF workflow implementation for the BayAreaTripWorkflow example.
  */
 class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
 
-    @Delegate Workflow<BayAreaTripActivities> workflow = SwfWorkflow.of(BayAreaTripActivities)
+    @Delegate
+    WorkflowOperations<BayAreaTripActivities> workflowOperations = SwfWorkflowOperations.of(BayAreaTripActivities)
 
     @Override
     void start(String name, Collection<BayAreaLocation> previouslyVisited) {
