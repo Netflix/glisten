@@ -105,7 +105,6 @@ class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
                                 withMaximumAttempts(numberOfTokens).withExceptionsToRetry([IllegalStateException])
                         DoTry<String> tryToWin = doTry {
                             retry(retryPolicy) {
-                                if (numberOfTokens <= 0) { null }
                                 numberOfTokens--
                                 return promiseFor(activities.win('a carnival game'))
                             }
