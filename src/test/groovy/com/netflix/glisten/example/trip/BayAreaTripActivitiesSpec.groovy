@@ -15,16 +15,14 @@
  */
 package com.netflix.glisten.example.trip
 
-import com.netflix.glisten.Activity
-import com.netflix.glisten.example.trip.BayAreaLocation
-import com.netflix.glisten.example.trip.BayAreaTripActivitiesImpl
+import com.netflix.glisten.ActivityOperations
 import spock.lang.Specification
 
 class BayAreaTripActivitiesSpec extends Specification {
 
-    Activity mockActivity = Mock(Activity)
+    ActivityOperations mockActivity = Mock(ActivityOperations)
     BayAreaTripActivitiesImpl bayAreaTripActivities = new BayAreaTripActivitiesImpl(
-            activity: mockActivity, hikeNameToLengthInSteps: ['there': 3]
+            activityOperations: mockActivity, hikeNameToLengthInSteps: ['there': 3]
     )
 
     def 'should go to Monterey'() {

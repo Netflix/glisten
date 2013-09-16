@@ -22,7 +22,7 @@ import com.amazonaws.services.simpleworkflow.model.WorkflowExecution
 /**
  * SWF specific implementation.
  */
-class SwfActivity implements Activity {
+class SwfActivityOperations implements ActivityOperations {
 
     private ActivityExecutionContextProvider provider = new ActivityExecutionContextProviderImpl()
 
