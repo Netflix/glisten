@@ -17,15 +17,15 @@ package com.netflix.glisten.example.trip
 
 import com.amazonaws.services.simpleworkflow.flow.annotations.ManualActivityCompletion
 import com.amazonaws.services.simpleworkflow.model.WorkflowExecution
-import com.netflix.glisten.Activity
-import com.netflix.glisten.SwfActivity
+import com.netflix.glisten.ActivityOperations
+import com.netflix.glisten.SwfActivityOperations
 
 /**
  * SWF activity implementations for the BayAreaTripWorkflow example.
  */
 class BayAreaTripActivitiesImpl implements BayAreaTripActivities {
 
-    @Delegate Activity activity = new SwfActivity()
+    @Delegate ActivityOperations activityOperations = new SwfActivityOperations()
 
     // In a real ActivitiesImpl this would probably be an injected service rather than a map with mutable state
     Map<String, Integer> hikeNameToLengthInSteps = [:]
@@ -37,6 +37,7 @@ class BayAreaTripActivitiesImpl implements BayAreaTripActivities {
     String goTo(String name, BayAreaLocation location) {
         "${name} went to ${location}."
     }
+
     @Override
     String enjoy(String something) {
         "And enjoyed ${something}."
@@ -47,7 +48,7 @@ class BayAreaTripActivitiesImpl implements BayAreaTripActivities {
         int stepsTaken = 0
         int totalStepsForHike = hikeNameToLengthInSteps[somewhere] ?: 100
         while (stepsTaken < totalStepsForHike) {
-            activity.recordHeartbeat("Took ${++stepsTaken} steps.")
+            recordHeartbeat("Took ${++stepsTaken} steps.")
         }
         "And hiked ${somewhere}."
     }
@@ -64,7 +65,7 @@ class BayAreaTripActivitiesImpl implements BayAreaTripActivities {
     @ManualActivityCompletion
     @Override
     boolean askYesNoQuestion(String question) {
-        sendManualActivityCompletionInfo(activity.taskToken, activity.workflowExecution)
+        sendManualActivityCompletionInfo(taskToken, workflowExecution)
         true // does not matter what is returned here because the result will be supplied manually
     }
 

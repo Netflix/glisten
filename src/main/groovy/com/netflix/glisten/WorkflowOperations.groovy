@@ -27,7 +27,7 @@ import java.util.concurrent.CancellationException
  *
  * @param < A > The interface for the SWF activities used by this workflow.
  */
-abstract class Workflow<A> {
+abstract class WorkflowOperations<A> {
 
     final List<String> logHistory = []
 
@@ -156,8 +156,7 @@ abstract class Workflow<A> {
      * @param work to do
      * @return a promised result of the work
      */
-    @Override
-    <T> Promise<T> retry(Closure<? extends Promise<T>> work) {
+    public <T> Promise<T> retry(Closure<? extends Promise<T>> work) {
         retry(new ExponentialRetryPolicy(1L), work)
     }
 }

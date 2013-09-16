@@ -15,17 +15,14 @@
  */
 package com.netflix.glisten.example.trip
 
-import com.netflix.glisten.example.trip.BayAreaLocation
-import com.netflix.glisten.example.trip.BayAreaTripActivities
-import com.netflix.glisten.example.trip.BayAreaTripWorkflow
-import com.netflix.glisten.example.trip.BayAreaTripWorkflowImpl
-import com.netflix.glisten.LocalWorkflow
+import com.netflix.glisten.LocalWorkflowOperations
 import spock.lang.Specification
 
 class BayAreaTripWorkflowSpec extends Specification {
 
     BayAreaTripActivities mockActivities = Mock(BayAreaTripActivities)
-    BayAreaTripWorkflow workflow = new BayAreaTripWorkflowImpl(workflow: LocalWorkflow.of(mockActivities))
+    BayAreaTripWorkflow workflow = new BayAreaTripWorkflowImpl(
+            workflowOperations: LocalWorkflowOperations.of(mockActivities))
 
     def 'should go to Golden Gate Bridge'() {
         when:

@@ -20,16 +20,12 @@ import com.amazonaws.services.simpleworkflow.flow.WorkflowClock
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.core.Settable
 import com.amazonaws.services.simpleworkflow.flow.worker.CurrentDecisionContext
-import com.netflix.glisten.AsyncCaller
-import com.netflix.glisten.DoTry
-import com.netflix.glisten.SwfWorkflow
-import com.netflix.glisten.Workflow
 import com.netflix.glisten.example.trip.BayAreaTripActivities
 import spock.lang.Specification
 
 class SwfWorkflowSpec extends Specification {
 
-    Workflow<BayAreaTripActivities> workflow = SwfWorkflow.of(BayAreaTripActivities)
+    WorkflowOperations<BayAreaTripActivities> workflow = SwfWorkflowOperations.of(BayAreaTripActivities)
 
     def 'should get activities'() {
         expect:
@@ -83,7 +79,7 @@ class SwfWorkflowSpec extends Specification {
     def 'should start timer'() {
         CurrentDecisionContext.CURRENT.set(Mock(DecisionContext))
         WorkflowClock workflowClock = Mock(WorkflowClock)
-        ((SwfWorkflow) workflow).overrideDecisionContext = Mock(DecisionContext) {
+        ((SwfWorkflowOperations) workflow).overrideDecisionContext = Mock(DecisionContext) {
             getWorkflowClock() >> workflowClock
         }
 
@@ -97,7 +93,7 @@ class SwfWorkflowSpec extends Specification {
     def 'should retry'() {
         CurrentDecisionContext.CURRENT.set(Mock(DecisionContext))
         WorkflowClock workflowClock = Mock(WorkflowClock)
-        ((SwfWorkflow) workflow).overrideDecisionContext = Mock(DecisionContext) {
+        ((SwfWorkflowOperations) workflow).overrideDecisionContext = Mock(DecisionContext) {
             getWorkflowClock() >> workflowClock
         }
 

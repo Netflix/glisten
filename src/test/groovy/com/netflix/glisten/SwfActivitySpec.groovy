@@ -18,12 +18,11 @@ package com.netflix.glisten
 import com.amazonaws.services.simpleworkflow.flow.ActivityExecutionContext
 import com.amazonaws.services.simpleworkflow.flow.ActivityExecutionContextProvider
 import com.amazonaws.services.simpleworkflow.model.WorkflowExecution
-import com.netflix.glisten.SwfActivity
 import spock.lang.Specification
 
 class SwfActivitySpec extends Specification {
 
-    SwfActivity activity = new SwfActivity()
+    SwfActivityOperations activity = new SwfActivityOperations()
     ActivityExecutionContext context = Mock(ActivityExecutionContext) {
         getTaskToken() >> '123'
         getWorkflowExecution() >> new WorkflowExecution(runId: 'abc', workflowId: 'def')

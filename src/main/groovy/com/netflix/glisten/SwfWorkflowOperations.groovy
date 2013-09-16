@@ -32,10 +32,10 @@ import groovy.transform.Canonical
  * SWF specific implementation.
  */
 @Canonical
-class SwfWorkflow<A> extends Workflow<A> {
+class SwfWorkflowOperations<A> extends WorkflowOperations<A> {
 
-    static <T> SwfWorkflow<T> of(Class<T> activitiesType, ActivitySchedulingOptions activitySchedulingOptions = null) {
-        new SwfWorkflow<T>(activitiesType, activitySchedulingOptions)
+    static <T> SwfWorkflowOperations<T> of(Class<T> activitiesType, ActivitySchedulingOptions activitySchedulingOptions = null) {
+        new SwfWorkflowOperations<T>(activitiesType, activitySchedulingOptions)
     }
 
     final Class<A> activitiesType
