@@ -15,7 +15,9 @@
  */
 package com.netflix.glisten
 
-import com.netflix.glisten.WorkflowTags
+import com.amazonaws.services.simpleworkflow.flow.DynamicWorkflowClientExternal
+import com.amazonaws.services.simpleworkflow.flow.StartWorkflowOptions
+import groovy.transform.Canonical
 import spock.lang.Specification
 
 class WorkflowTagsSpec extends Specification {
@@ -102,4 +104,27 @@ class WorkflowTagsSpec extends Specification {
         workflowTags.desc == 'this one will win'
     }
 
+    def 'client should construct specific tags without destroying original ones'() {
+        DynamicWorkflowClientExternal client = Mock(DynamicWorkflowClientExternal)
+        client.schedulingOptions >> new StartWorkflowOptions(tagList:
+                new ExtraWorkflowTags(extraStuff: new WrappingObject('house-targaryen')).constructTags())
+        def adapter = new WorkflowClientExternalToWorkflowInterfaceAdapter(client, TestWorkflow,
+                new TestWorkflowDescriptionTemplate(), new ExtraWorkflowTags())
+
+        when:
+        adapter.go('Rhaegar', new WrappingObject(nestedName: 'Targaryen'))
+
+        then:
+        1 * client.startWorkflowExecution(_, _) >> { List<?> args ->
+            assert args[1].tagList as Set == [
+                    '{"desc":"Describe workflow for \'Rhaegar\' \'Targaryen\'"}',
+                    '{"extraStuff":["com.netflix.glisten.WrappingObject",{"nestedName":"house-targaryen"}]}'
+            ] as Set
+        }
+    }
+}
+
+@Canonical
+class ExtraWorkflowTags extends WorkflowTags {
+    WrappingObject extraStuff
 }
