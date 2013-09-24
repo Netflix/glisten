@@ -1,0 +1,45 @@
+digraph bayAreaTrip {
+
+    subgraph clusterFlow {
+	    label="Flow"
+	    color=red
+        subgraph clusterActivities {
+    		label="Activities"
+            activitiesInterface [label = "Activities Interface"]
+            activitiesImplementation [label = "Activities Implementation" shape="rectangle"]
+            activitiesInterface -> activitiesImplementation [dir=back arrowtail=oarrow]
+        }
+    
+        subgraph clusterWorkflow {
+    		label="Workflow"
+            workflowInterface [label = "Workflow Interface"]
+            workflowImplementation [label = "Workflow Implementation" shape="rectangle"]
+            workflowInterface -> workflowImplementation [dir=back arrowtail=oarrow]
+        }
+    }
+
+	subgraph clusterGlisten {
+        color=green
+		label="Glisten"
+	    workflowOperations [label = "WorkflowOperations<Activities>" shape="rectangle"]
+	    activityOperations [label = "ActivityOperations" shape="rectangle"]
+	    swfWorkflowOperations [label = "SwfWorkflowOperations<Activities>" shape="rectangle"]
+	    swfActivityOperations [label = "SwfActivityOperations" shape="rectangle"]
+	    localWorkflowOperations [label = "LocalWorkflowOperations<Activities>" shape="rectangle"]
+	    localActivityOperations [label = "LocalActivityOperations" shape="rectangle"]
+	
+	    workflowOperations -> swfWorkflowOperations [dir=back arrowtail=oarrow]
+	    workflowOperations -> localWorkflowOperations [dir=back arrowtail=oarrow]
+	    activityOperations -> swfActivityOperations [dir=back arrowtail=oarrow]
+	    activityOperations -> localActivityOperations [dir=back arrowtail=oarrow]
+	}
+	
+	    workflowImplementation -> workflowOperations [dir=back arrowtail=diamond]
+		    workflowImplementation -> workflowOperations [style=invis]
+		activitiesImplementation -> activityOperations [style=invis]
+			activitiesImplementation -> activityOperations [style=invis]
+			activitiesImplementation -> activityOperations [dir=back arrowtail=diamond]
+			activitiesImplementation -> activityOperations [style=invis]
+	    workflowOperations -> activitiesInterface [dir=back arrowtail=diamond]
+
+}

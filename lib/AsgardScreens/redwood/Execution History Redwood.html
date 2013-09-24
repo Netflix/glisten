@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<!-- saved from url=(0164)http://localhost:8080/workflowExecution/show?runId=12QjZv7ekJftftU6rcZyAFNofB1xBuCGv6HtcWbqrDGko%3D&workflowId=b2208791-1984-4072-bfa2-f5866a95e7f7&region=us-west-1 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Execution History</title>
+</head>
+<body class="test ">
+  
+<div class="body">
+  <h1>Workflow Execution History</h1>
+  <table>
+    <tbody><tr class="prop">
+      <td class="name">Tags:</td>
+      <td class="value">[{"desc":"Clay is taking a trip in the Bay Area."}, {"user":{"ticket":null,"username":"cmccoy","clientHostName":"localhost","clientIpAddress":"0:0:0:0:0:0:0:1%0","region":"US_WEST_1","internalAutomation":false}}]</td>
+    </tr>
+    <tr class="prop">
+      <td class="name">Workflow ID:</td>
+      <td class="value">b2208791-1984-4072-bfa2-f5866a95e7f7</td>
+    </tr>
+    <tr class="prop">
+      <td class="name">Run ID:</td>
+      <td class="value">12QjZv7ekJftftU6rcZyAFNofB1xBuCGv6HtcWbqrDGko=</td>
+    </tr>
+  </tbody></table>
+  <div class="list">
+    <table class="sortable">
+      <thead>
+      <tr>
+        <th>Event</th>
+        <th>Scheduled</th>
+        <th>Elapsed Time</th>
+        <th>Event Type</th>
+        <th>Version</th>
+        <th>Name</th>
+        <th>Input/Result/Context</th>
+        <th>Identity</th>
+      </tr>
+      </thead>
+      <tbody>
+      
+        <tr class="odd">
+          <td>1</td>
+          <td></td>
+          <td>+0s</td>
+          <td>WorkflowExecutionStarted</td>
+          <td>1.0</td>
+          <td>BayAreaTripWorkflow.start</td>
+          <td>["[Ljava.lang.Object;",["Clay",["java.util.ArrayList",[["com.netflix.asgard.flow.example.trip.BayAreaLocation","GoldenGateBridge"]]]]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>2</td>
+          <td></td>
+          <td>+0s</td>
+          <td>DecisionTaskScheduled</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>3</td>
+          <td>2</td>
+          <td>+0s</td>
+          <td>DecisionTaskStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td>45379@lgmac-cmccoy2</td>
+        </tr>
+      
+        <tr class="even">
+          <td>4</td>
+          <td>2</td>
+          <td>+0s</td>
+          <td>DecisionTaskCompleted</td>
+          <td></td>
+          <td></td>
+          <td>["java.util.ArrayList",[]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>5</td>
+          <td></td>
+          <td>+0s</td>
+          <td>ActivityTaskScheduled</td>
+          <td>1.0</td>
+          <td>BayAreaTripActivities.goTo</td>
+          <td>["[Ljava.lang.Object;",["Clay",["com.netflix.asgard.flow.example.trip.BayAreaLocation","Redwoods"]]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>6</td>
+          <td>5</td>
+          <td>+0s</td>
+          <td>ActivityTaskStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td>45379@lgmac-cmccoy2</td>
+        </tr>
+      
+        <tr class="odd">
+          <td>7</td>
+          <td>5</td>
+          <td>+0s</td>
+          <td>ActivityTaskCompleted</td>
+          <td></td>
+          <td></td>
+          <td>"Clay went to Muir Woods."<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>8</td>
+          <td></td>
+          <td>+0s</td>
+          <td>DecisionTaskScheduled</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>9</td>
+          <td>8</td>
+          <td>+0s</td>
+          <td>DecisionTaskStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td>45379@lgmac-cmccoy2</td>
+        </tr>
+      
+        <tr class="even">
+          <td>10</td>
+          <td>8</td>
+          <td>+0s</td>
+          <td>DecisionTaskCompleted</td>
+          <td></td>
+          <td></td>
+          <td>["java.util.ArrayList",["Clay went to Muir Woods.","And stretched for 10 seconds before hiking."]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>11</td>
+          <td></td>
+          <td>+0s</td>
+          <td>TimerStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>12</td>
+          <td></td>
+          <td>+10s</td>
+          <td>TimerFired</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>13</td>
+          <td></td>
+          <td>+10s</td>
+          <td>DecisionTaskScheduled</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>14</td>
+          <td>13</td>
+          <td>+10s</td>
+          <td>DecisionTaskStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td>45379@lgmac-cmccoy2</td>
+        </tr>
+      
+        <tr class="odd">
+          <td>15</td>
+          <td>13</td>
+          <td>+11s</td>
+          <td>DecisionTaskCompleted</td>
+          <td></td>
+          <td></td>
+          <td>["java.util.ArrayList",["Clay went to Muir Woods.","And stretched for 10 seconds before hiking."]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>16</td>
+          <td></td>
+          <td>+11s</td>
+          <td>TimerStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>17</td>
+          <td></td>
+          <td>+11s</td>
+          <td>ActivityTaskScheduled</td>
+          <td>1.0</td>
+          <td>BayAreaTripActivities.hike</td>
+          <td>["[Ljava.lang.Object;",["through redwoods"]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>18</td>
+          <td>17</td>
+          <td>+11s</td>
+          <td>ActivityTaskStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td>45379@lgmac-cmccoy2</td>
+        </tr>
+      
+        <tr class="odd">
+          <td>19</td>
+          <td>17</td>
+          <td>+22s</td>
+          <td>ActivityTaskCompleted</td>
+          <td></td>
+          <td></td>
+          <td>"And hiked through redwoods."<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>20</td>
+          <td></td>
+          <td>+22s</td>
+          <td>DecisionTaskScheduled</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>21</td>
+          <td>20</td>
+          <td>+22s</td>
+          <td>DecisionTaskStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td>45379@lgmac-cmccoy2</td>
+        </tr>
+      
+        <tr class="even">
+          <td>22</td>
+          <td>20</td>
+          <td>+22s</td>
+          <td>DecisionTaskCompleted</td>
+          <td></td>
+          <td></td>
+          <td>["java.util.ArrayList",["Clay went to Muir Woods.","And stretched for 10 seconds before hiking.","And hiked through redwoods."]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>23</td>
+          <td></td>
+          <td>+22s</td>
+          <td>TimerCanceled</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>24</td>
+          <td></td>
+          <td>+22s</td>
+          <td>WorkflowExecutionCompleted</td>
+          <td></td>
+          <td></td>
+          <td>null<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  <script type="text/javascript">
+    window.browserGlobalsFromServer = {
+      groupResizeDefaultBatchSize: 500,
+      params: {
+  "region": "us-west-1",
+  "workflowId": "b2208791-1984-4072-bfa2-f5866a95e7f7",
+  "runId": "12QjZv7ekJftftU6rcZyAFNofB1xBuCGv6HtcWbqrDGko=",
+  "action": "show",
+  "controller": "workflowExecution"
+},
+      region: 'us-west-1',
+      requireLoginForEdit: false
+    };
+  </script>
+  <script type="text/javascript" src="./Execution History Redwood_files/jquery.js"></script>
+  <script defer="" type="text/javascript" src="./Execution History Redwood_files/select2.min.js"></script>
+  <script defer="" type="text/javascript" src="./Execution History Redwood_files/custom.js"></script>
+  
+  
+
+
+
+
+
+</body></html>

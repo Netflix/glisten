@@ -1,0 +1,34 @@
+digraph workflowHistory {
+
+    WorkflowExecutionStarted [shape=hexagon color=green]
+	
+    subgraph clusterDecision {
+        DecisionTaskScheduled [shape=rectangle color=blue]
+        DecisionTaskStarted [shape=rectangle color=blue]
+        DecisionTaskCompleted [shape=rectangle color=blue]
+    }
+    subgraph clusterTimer {
+        TimerStarted
+        TimerFired
+    }
+	subgraph clusterActivities {
+        ActivityTaskScheduled
+        ActivityTaskStarted
+        ActivityTaskCompleted
+	}
+    WorkflowExecutionCompleted [shape=hexagon color=red]
+
+    WorkflowExecutionStarted -> DecisionTaskScheduled
+    DecisionTaskScheduled -> DecisionTaskStarted
+    DecisionTaskStarted -> DecisionTaskCompleted
+    DecisionTaskCompleted -> TimerStarted
+    TimerStarted -> TimerFired
+    TimerFired -> DecisionTaskScheduled
+    DecisionTaskCompleted -> ActivityTaskScheduled
+    ActivityTaskScheduled -> ActivityTaskStarted
+    ActivityTaskStarted -> ActivityTaskCompleted
+    ActivityTaskCompleted -> DecisionTaskScheduled
+    DecisionTaskCompleted -> WorkflowExecutionCompleted
+    WorkflowExecutionCompleted
+
+}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<!-- saved from url=(0166)http://localhost:8080/workflowExecution/show?runId=1211xxwIQ1LTRvf7lEbloAJ%2BXPcuOMkrynP6RRH3iCdFk%3D&workflowId=12d00ac2-7777-4ee9-9099-dfa23c7f2a05&region=us-west-1 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Execution History</title>
+</head>
+<body class="test ">
+  
+<div class="body">
+  <h1>Workflow Execution History</h1>
+  <table>
+    <tbody><tr class="prop">
+      <td class="name">Tags:</td>
+      <td class="value">[{"desc":"Clay is taking a trip in the Bay Area."}, {"user":{"ticket":null,"username":"cmccoy","clientHostName":"localhost","clientIpAddress":"0:0:0:0:0:0:0:1%0","region":"US_WEST_1","internalAutomation":false}}]</td>
+    </tr>
+    <tr class="prop">
+      <td class="name">Workflow ID:</td>
+      <td class="value">12d00ac2-7777-4ee9-9099-dfa23c7f2a05</td>
+    </tr>
+    <tr class="prop">
+      <td class="name">Run ID:</td>
+      <td class="value">1211xxwIQ1LTRvf7lEbloAJ+XPcuOMkrynP6RRH3iCdFk=</td>
+    </tr>
+  </tbody></table>
+  <div class="list">
+    <table class="sortable">
+      <thead>
+      <tr>
+        <th>Event</th>
+        <th>Scheduled</th>
+        <th>Elapsed Time</th>
+        <th>Event Type</th>
+        <th>Version</th>
+        <th>Name</th>
+        <th>Input/Result/Context</th>
+        <th>Identity</th>
+      </tr>
+      </thead>
+      <tbody>
+      
+        <tr class="odd">
+          <td>1</td>
+          <td></td>
+          <td>+0s</td>
+          <td>WorkflowExecutionStarted</td>
+          <td>1.0</td>
+          <td>BayAreaTripWorkflow.start</td>
+          <td>["[Ljava.lang.Object;",["Clay",["java.util.ArrayList",[["com.netflix.asgard.flow.example.trip.BayAreaLocation","GoldenGateBridge"],["com.netflix.asgard.flow.example.trip.BayAreaLocation","Redwoods"]]]]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>2</td>
+          <td></td>
+          <td>+0s</td>
+          <td>DecisionTaskScheduled</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>3</td>
+          <td>2</td>
+          <td>+0s</td>
+          <td>DecisionTaskStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td>45379@lgmac-cmccoy2</td>
+        </tr>
+      
+        <tr class="even">
+          <td>4</td>
+          <td>2</td>
+          <td>+1s</td>
+          <td>DecisionTaskCompleted</td>
+          <td></td>
+          <td></td>
+          <td>["java.util.ArrayList",[]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>5</td>
+          <td></td>
+          <td>+1s</td>
+          <td>ActivityTaskScheduled</td>
+          <td>1.0</td>
+          <td>BayAreaTripActivities.askYesNoQuestion</td>
+          <td>["[Ljava.lang.Object;",["Do you like roller coasters?"]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>6</td>
+          <td>5</td>
+          <td>+1s</td>
+          <td>ActivityTaskStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td>45379@lgmac-cmccoy2</td>
+        </tr>
+      
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  <script type="text/javascript">
+    window.browserGlobalsFromServer = {
+      groupResizeDefaultBatchSize: 500,
+      params: {
+  "region": "us-west-1",
+  "workflowId": "12d00ac2-7777-4ee9-9099-dfa23c7f2a05",
+  "runId": "1211xxwIQ1LTRvf7lEbloAJ+XPcuOMkrynP6RRH3iCdFk=",
+  "action": "show",
+  "controller": "workflowExecution"
+},
+      region: 'us-west-1',
+      requireLoginForEdit: false
+    };
+  </script>
+  <script type="text/javascript" src="./Execution History Ask_files/jquery.js"></script>
+  <script defer="" type="text/javascript" src="./Execution History Ask_files/select2.min.js"></script>
+  <script defer="" type="text/javascript" src="./Execution History Ask_files/custom.js"></script>
+  
+  
+
+
+
+
+
+</body></html>

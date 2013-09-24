@@ -1,0 +1,1140 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Glisten</title>
+
+		<meta name="description" content="Orchestrating Tasks from the Cloud with Groovy and AWS SWF">
+		<meta name="author" content="Clay McCoy">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section data-background="lib/img/2412174366_22cf191484_o.jpg">
+					<h1>Orchestrating Tasks from the Cloud</h1>
+					<h3>With Groovy and AWS SWF</h3>
+					<p><small>Created by Clay McCoy</small></p>
+						<br/>
+						<p><small>latest version of slides is on Github</small></p>
+						<pre style="opacity:0.7"><code contenteditable>git clone -b groovySwf https://github.com/claymccoy/reveal.js.git
+open reveal.js/index.html
+</code></pre>
+				</section>
+
+				<section data-background="lib/img/wakeboard.jpg">
+					<div style="position:relative;left:25%;">
+						<h2>About Me</h2>
+						<ul>
+							<li>Clay McCoy</li>
+							<li><a href="http://www.claymccoy.com">www.claymccoy.com</a></li>
+							<li><a href="https://twitter.com/ClayMcCoy">twitter.com/ClayMcCoy</a></li>
+							<li><a href="https://github.com/claymccoy">github.com/claymccoy</a>
+						</ul>
+					</div>
+				</section>
+
+				<section data-background="lib/img/family.png">
+					<div style="position:relative;left:25%;">
+						<h2>About Me</h2>
+						<ul>
+							<li>Sr. Software Engineer @ Netflix</li>
+							<li>Engineering Tools Team</li>
+							<li>Contributes to <a href="https://github.com/Netflix/asgard">Asgard</a>
+					</div>
+				</section>
+
+				<section data-background="lib/img/asgard-blog-post-cluster.png">
+					<h2>Asgard</h2>
+					<ul>
+						<li>web app written in Grails</li>
+						<li>used for deployment to AWS</li>
+						<li>open sourced on Github</li>
+					</ul>
+				</section>
+
+				<section>
+					<img style="opacity:0.8" src="lib/img/netflix_oss.jpg">
+					<h2>Why does Netflix open source?</h2>
+					<ul>
+						<li>share with community</li>
+						<li>recruiting and retaining</li>
+						<li>we want you to use AWS like we do</li>
+						<li>fix AWS gaps, expose issues</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/3036565228_bc8e9e9cdf_o.png">
+					<h2>Asgard needed a workflow service</h2>
+					<ul>
+						<li>Task coordination</li>
+						<li>Long lived tasks</li>
+						<li>Distributed tasks</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/6830729179_0ff4a9f188_b.jpg">
+					<h2>Overview</h2>
+					<ul>
+						<li>AWS SWF</li>
+						<li>AWS Flow</li>
+						<li>Groovy and SWF</li>
+						<li>distributed workflow examples</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/5112340801_fe22999400_o.jpg">
+					<h2>Amazon SWF</h2>
+					<p>"Amazon Simple Workflow (Amazon SWF) is a task coordination and state management service for cloud applications. With Amazon SWF, you can stop writing complex glue-code and state machinery and invest more in the business logic that makes your applications unique."</p>
+				</section>
+
+				<section data-background="lib/img/5112340801_fe22999400_o.jpg">
+					<h2>SWF compared to _?</h2>
+					<ul>
+						<li>write my own workflow framework<ul>
+						    <li>it is harder than you think</li>
+					    </ul></li>
+						<li>use an existing workflow framework<ul>
+						    <li>not a distributed service</li>
+					    </ul></li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/5112340801_fe22999400_o.jpg">
+					<h2>SWF compared to <a href="http://aws.amazon.com/swf/faqs/#different_from_sqs">SQS</a>?</h2>
+					<ul>
+						<li>task based API vs message based API</li>
+						<li>archiving of tasks and querying execution details</li>
+						<li>distributed error handling</li>
+						<li>retries vs taking different action based message received count</li>
+						<li>routing and versioning task handlers vs managing mulitple queues</li>
+						<li>timers and timeouts</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/5112340801_fe22999400_o.jpg">
+					<h2>SWF guarantees</h2>
+					<ul>
+						<li>tasks will be performed once and only once</li>
+						<li>ordered tasks</li>
+						<li>task will either succeed with a result or notify of failure</li>
+						<li>stores each activity's result or failure</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/5112340801_fe22999400_o.jpg">
+					<h2>Amazon SWF concepts</h2>
+					<ul>
+						<li><b>long polling</b> for tasks</li>
+						<li><b>decision tasks</b> quickly decide what to do next</li>
+						<li><b>activity tasks</b> do real work</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/5112340801_fe22999400_o.jpg">
+					<h2>Workflow Execution</h2>
+					<ul>
+						<li>Workflow IDs<ul>
+						    <li>Run ID</li>
+						    <li>Workflow ID</li>
+						    <li>unfortunately both are needed for uniqueness</li>
+					    </ul></li>
+						<li>tags<ul>
+						    <li>you get 5 that are Strings (256 characters)</li>
+						    <li>indexed and intended for searching/filtering by</li>
+						    <li>tempting to put your own metadata in</li>
+					    </ul></li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/5112340801_fe22999400_o.jpg" data-transition="zoom">
+					<h2>Workflow history</h2>
+					<img style="opacity:0.8" src="lib/img/graphs/workflowHistory.png">
+				</section>
+
+				<section data-background="lib/img/graphs/workflowHistory.png">
+					<h3>Workflow history</h3>
+					<ul>
+						<li>history is kept in AWS</li>
+						<li>work is executed on your machines</li>
+						<li>deciders get the history so far with decision tasks</li>
+						<li>many more types of history events</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/5112340801_fe22999400_o.jpg">
+					<h2>Routing tasks</h2>
+					<p>keep distributed tasks from executing on your dev machine</p>
+					<ul>
+						<li>domains<ul>
+						    <li>namespace</li>
+						    <li>must be registered</li>
+						    <li>cannot be deleted</li>
+					    </ul></li>
+						<li>tasklists<ul>
+						    <li>just Strings for routing within a domain</li>
+						    <li>no need to register</li>
+					    </ul></li>
+						<li>versioning<ul>
+						    <li>can be set per workflow and per activity</li>
+						    <li>allows different code within tasklists </li>
+					    </ul></li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/5112340801_fe22999400_o.jpg">
+					<h3>Things to consider when writing a distributed workflow</h3>
+					<ul>
+						<li>serialization of inputs and results to Strings (4k bytes)</li>
+						<li>heartbeats for long running activities<ul>
+					        <li>better timeout behavior</li>
+					        <li>display message of last heartbeat on error</li>
+					        <li>more responsive cancel</li>
+					    </ul></li>
+						<li>idempotence where possible</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/workflow_timeouts.png">
+					<h2>Workflow timeouts</h2>
+					<ul>
+						<li>Workflow Start to Close</li>
+						<li>Decision Task Start to Close</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/activity_timeouts.png">
+					<h2>Activity timeouts</h2>
+					<ul>
+						<li>Activity Task Start to Close</li>
+						<li>Activity Task Heartbeat</li>
+						<li>Activity Task Schedule to Start</li>
+						<li>Activity Task Schedule to Close</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/graphs/workflowHistory.png">
+					<h3><a href="http://docs.aws.amazon.com/amazonswf/latest/apireference/Welcome.html">SWF API</a></h3>
+					<p>You are responsible for doing these things and more:</p>
+					<ul>
+						<li>Register <a href="http://docs.aws.amazon.com/amazonswf/latest/apireference/API_RegisterDomain.html">Domains</a>, <a href="http://docs.aws.amazon.com/amazonswf/latest/apireference/API_RegisterWorkflowType.html">WorkflowTypes</a>, <a href="http://docs.aws.amazon.com/amazonswf/latest/apireference/API_RegisterActivityType.html">ActivityTypes</a></li>
+						<li><a href="http://docs.aws.amazon.com/amazonswf/latest/apireference/API_StartWorkflowExecution.html">start workflows</a></li>
+						<li><a href="http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dev-comm-proto.html">write pollers</a> for <a href="http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dg-dev-deciders.html#swf-dg-polling-decision-tasks">decision tasks</a> and <a href="http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dg-develop-activity.html#swf-dg-polling-activity-tasks">activity tasks</a></li>
+						<li><a href="http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dg-dev-deciders.html">write deciders</a></li>
+						<li>handle <a href="http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dg-error-handling.html">error</a> and <a href="http://docs.aws.amazon.com/amazonswf/latest/awsflowguide/swf-timeout-types.html">timeouts</a></li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/graphs/workflowHistory.png">
+					<h3><a href="http://docs.aws.amazon.com/amazonswf/latest/apireference/Welcome.html">SWF API</a></h3>
+					<p>You must really know about:</p>
+					<ul>
+						<li><a href="http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dev-workflow-exec-lifecycle.html">workflow execution life cycle</a></li>
+						<li><a href="http://docs.aws.amazon.com/amazonswf/latest/developerguide/swf-dev-about-workflow-history.html">workflow execution history</a></li>
+						<li><a href="http://docs.aws.amazon.com/amazonswf/latest/apireference/API_HistoryEvent.html">all history event types</a></li>
+						<li><a href="http://docs.aws.amazon.com/amazonswf/latest/apireference/API_Decision.html">all decision types</a></li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/5112340801_fe22999400_o.jpg">
+					<p>SWF API</p>
+					<ul>
+						<li>good for managing AWS SWF objects<ul>
+					       	<li>Domain</li>
+					       	<li>Workflow Type</li>
+					       	<li>Activity Type</li>
+					       	<li>Workflow Execution</li>
+					    </ul></li>
+						<li>bad for writing workflows<ul>
+					       	<li>consume history events and provide decisions</li>
+					       	<li>workflow becomes a low level state machine</li>
+					    </ul></li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/145746706_6b85c7537f_z.jpg">
+					<h2>Amazon Flow framework</h2>
+					<ul>
+						<li>higher level API removes boilerplate</li>
+						<li>decider logic looks like typical Java</li>
+						<li>provides pollers, deciders, history analyzers</li>
+						<li>registers workflows and activites by version</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/145746706_6b85c7537f_z.jpg">
+					<h3>Flow based code structure</h3>
+					<img style="opacity:0.6" src="lib/img/graphs/FlowClassStructure.png">
+					<ul class="fragment">
+						<li>workflow impl is decider logic used to orchestrate</li>
+						<li>workflows should be stateless and quick (replayed)</li>
+						<li>activities do the real work</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/145746706_6b85c7537f_z.jpg">
+					<h3>Flow based code structure</h3>
+					<p>interfaces</p>
+<pre style="opacity:0.7"><code contenteditable>@Workflow
+@WorkflowRegistrationOptions(
+    defaultExecutionStartToCloseTimeoutSeconds = 60L)
+interface TestWorkflow {
+@Execute(version = '1.0')
+    void doIt()
+}
+</code></pre>
+<pre style="opacity:0.7"><code contenteditable>@Activities(version = "1.0")
+@ActivityRegistrationOptions(
+    defaultTaskScheduleToStartTimeoutSeconds = -1L,
+    defaultTaskStartToCloseTimeoutSeconds = 300L)
+interface TestActivities {
+    String doSomething()
+    void consumeSomething(String thing)
+}
+</code></pre>
+					<ul class="fragment">
+						<li>Flow annotations</li>
+						<li>registers workflows and activites by version</li>
+						<li>configure timeouts</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/145746706_6b85c7537f_z.jpg">
+					<h3>code generation</h3>
+<pre style="opacity:0.7"><code contenteditable>interface TestActivities {
+    String doSomething()
+    void consumeSomething(String thing)
+}
+</code></pre>
+<div class="fragment">
+	<p>becomes</p>
+<pre style="opacity:0.7"><code contenteditable>interface TestActivitiesClient {
+    Promise&lt;String> doSomething()
+    void consumeSomething(Promise&lt;String> thing)
+}
+</code></pre>
+					<ul class="fragment">
+						<li>promises must be made</li>
+					</ul>
+</div>
+				</section>
+
+				<section data-background="lib/img/145746706_6b85c7537f_z.jpg">
+					<h3>Promise VS Future</h3><p>AWS Java SDK</p>
+	<p><font style="opacity:0.5">Promise is a future like object that is used as a placeholder for a result of an asynchronous API. Java Future is a synchronization construct that is used to block a thread that called get() method if result is not available yet. </font><b style="opacity:2">Promise differs from it as it cannot be used for blocking. A call to its get() method throws IllegalStateException if result is not available yet.</b><font style="opacity:0.5"> The correct way to ensure that Promise is ready is to access it from a method that is annotated as @Asynchronous and have the given Promise as one its arguments or from Task.doExecute() method assuming that promise was passed to the Task as a constructor parameter.</font></p>
+				</section>
+
+				<section data-background="lib/img/145746706_6b85c7537f_z.jpg">
+					<h3>Flow Workflow Impl</h3>
+<pre style="opacity:0.7"><code contenteditable>class TestWorkflowImpl implements TestWorkflow {
+    private final TestActivitiesClient client = new TestActivitiesClientImpl();
+
+    void doIt() {
+        Promise&lt;String> result = client.doSomething()
+		waitForSomething(result)
+    }
+
+    @Asynchronous
+    void waitForSomething(Promise&lt;String> something) {
+        client.consumeSomething(something)
+    }
+}
+</code></pre>
+					<ul class="fragment">
+						<li>client is just generated versions of Activities</li>
+						<li>@Asynchronous methods gate promises</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/MousetrapGame2.jpg">
+					<h3>Difficult Setup</h3>
+					<ul>
+						<li>AspectJ and code generation</li>
+						<li>Groovy and Grails already have enough magic</li>
+						<li><a href="http://docs.aws.amazon.com/amazonswf/latest/awsflowguide/setup.html">Eclipse only instructions.</a></li>
+						<li><a href="http://stackoverflow.com/questions/9392655/how-to-consume-amazon-swf">even after following both the load-time and compile-time weaving instructions in the Setting up the Development Environment documentation I was unable to successfully get the classes</a></li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/tumblr_lqrxzyfOYZ1r0hoh6o1_500.jpg">
+					<h2>Groovy is good at hiding boilerplate code...</h2>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+					<h2>Glisten</h2>
+					<ul>
+						<li>Flow - (AspectJ + generated code) + Groovy</li>
+						<li>ease of use SWF library</li>
+						<li>still uses core Flow objects</li>
+						<li>was part of Asgard, now a separate project on Github</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+					<h2>Flow based code structure with Glisten</h2>
+					<img style="opacity:0.6" src="lib/img/graphs/FlowClassStructureWithGlisten.png">
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+					<h2>Flow based code structure with Glisten</h2>
+					<img style="opacity:0.6" src="lib/img/graphs/FlowClassStructureWithGlistenImpls.png">
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+<p>Abstract away activity concerns</p>
+<pre style="opacity:0.8"><code contenteditable>interface ActivityOperations {
+    void recordHeartbeat(String message)
+
+    WorkflowExecution getWorkflowExecution()
+
+    String getTaskToken()
+}
+</code></pre>
+					<ul class="fragment">
+						<li>recordHeartbeat sends status to workflow</li>
+						<li>WorkflowExecution is used for id</li>
+						<li>task token is id of activity</li>
+						<li>explain activities first, workflow is more interesting</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+<p>Abstract away worflow concerns</p>
+<pre style="opacity:0.8"><code contenteditable>interface WorkflowOperations&lt;A> {
+    A getActivities()
+
+    &lt;T> Promise&lt;T> waitFor(Promise promise, Closure&lt;Promise&lt;T>> work)
+    &lt;T> Promise&lt;T> promiseFor(T value)
+
+    AndPromise allPromises(Promise... promises)
+    OrPromise anyPromises(Promise... promises)
+
+    Promise&lt;Void> status(String message)
+
+    &lt;T> DoTry&lt;T> doTry(Closure&lt;Promise&lt;T>> work)
+    &lt;T> Promise&lt;T> retry(RetryPolicy retryPolicy,
+            Closure&lt;Promise&lt;T>> work)
+    Promise&lt;Void> timer(long delaySeconds)
+}
+</code></pre>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+					<pre><code>&lt;T> Promise&lt;T> waitFor(Promise promise, Closure&lt;Promise&lt;T>> work)</code></pre>
+<pre style="opacity:0.7"><code contenteditable>Promise&lt;String> promise = promiseFor(activities.doSomething())
+waitFor(promise) {
+    status promise.get()
+    Promise.Void
+}
+</code></pre>
+	<ul>
+		<li>promiseFor wraps activity result in a Promise</li>
+		<li>waitFor only executes work when Promise is ready</li>
+		<li>Promise.Void because work must return a Promise</li>
+	</ul>
+<div class="fragment">
+	<h3>or</h3>
+<pre style="opacity:0.7"><code contenteditable>waitFor(activities.doSomething()) {
+    status it
+}
+</code></pre>
+	<ul>
+		<li>pass waitFor activity itself</li>
+		<li>work closure is passed result when ready</li>
+		<li>status returns Promise.Void</li>
+	</ul>
+</div>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+<pre style="opacity:0.7"><code contenteditable>class TestWorkflowImpl implements TestWorkflow {
+    private final TestActivitiesClient client = new TestActivitiesClientImpl();
+
+    void doIt() {
+        Promise&lt;String> result = client.doSomething()
+		waitForSomething(result)
+    }
+
+    @Asynchronous
+    void waitForSomething(Promise&lt;String> something) {
+        client.consumeSomething(something)
+    }
+}
+</code></pre>
+					<p>Flow vs Glisten Workflow Impl</p>
+<pre style="opacity:0.7"><code contenteditable>class TestWorkflowImpl implements TestWorkflow {
+    @Delegate
+    WorkflowOperations&lt;TestActivities> workflowOperations = SwfWorkflowOperations.of(TestActivities)
+
+    void doIt() {
+        waitFor(activities.doSomething()) {
+            activities.consumeSomething(it)
+        }
+    }
+}
+</code></pre>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+					<p>Glisten Workflow Impl</p>
+<pre style="opacity:0.7"><code contenteditable>class TestWorkflowImpl implements TestWorkflow {
+    @Delegate
+    WorkflowOperations&lt;TestActivities> workflowOperations = SwfWorkflowOperations.of(TestActivities)
+
+    void doIt() {
+        waitFor(activities.doSomething()) {
+            activities.consumeSomething(it)
+        }
+    }
+}
+</code></pre>
+	<ul>
+		<li>no generated clients (forPromise worst case)</li>
+		<li>no @Asynchronous methods (waitFor)</li>
+	</ul>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+<pre style="opacity:0.7"><code contenteditable>new TryCatchFinally() {
+    @Override
+    protected void doTry() throws Throwable {
+        // try something
+    }
+
+    @Override
+    protected void doCatch(Throwable e) throws Throwable {
+        // handle error
+    }
+
+    @Override
+    protected void doFinally() throws Throwable {
+        // mandatory clean up
+    }
+}
+</code></pre>
+					<p>Flow vs Glisten Try Catch Finally</p>
+<pre style="opacity:0.7"><code contenteditable>doTry {
+    // try something
+} withCatch { Throwable t ->
+    // handle error
+} withFinally {
+   // mandatory clean up
+}.result
+</code></pre>
+				</section>
+				
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+					<p>Glisten Try Catch Finally</p>
+<pre style="opacity:0.7"><code contenteditable>doTry {
+    // try something
+} withCatch { Throwable t ->
+    // handle error
+} withFinally {
+   // mandatory clean up
+}.result
+</code></pre>
+	<ul>
+		<li>you don't have to manage result</li>
+		<li>creates a Flow TryCatchFinally</li>
+		<li>local version for use in unit tests</li>
+	</ul>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+					<h3>Glisten handles basic needs not met by SWF</h3>
+					<p>(by abusing tags and history)</p>
+	<ul>
+		<li>workflow execution description<ul>
+	        <li>shove data into a tag</li>
+	        <li>hooks to put your own metadata into 4 remaining tags</li>
+	    </ul></li>
+	    <li>log<ul>
+	        <li>status shoves data into history</li>
+	        <li>execution context of DecisionTaskCompletedEvent</li>
+	        <li>use a history analyzer to pull it out</li>
+	    </ul></li>
+	</ul>
+				</section>
+
+				<section data-background="lib/img/3719867208_f80b78affb_b.jpg">
+					<h2>Now for an Example</h2>
+				</section>
+
+				<section data-background="lib/img/3719867208_f80b78affb_b.jpg" data-transition="zoom">
+					<img style="opacity:0.8" src="lib/img/graphs/GraphBayAreaTripWorkflow.png">
+				</section>
+
+				<section data-background="lib/img/graphs/GraphBayAreaTripWorkflow.png">
+					<h3>Workflow Interface</h3>
+<pre style="opacity:0.6"><code contenteditable>@Workflow
+@WorkflowRegistrationOptions(
+        defaultExecutionStartToCloseTimeoutSeconds = 60L)
+interface BayAreaTripWorkflow {
+
+    @Execute(version = '1.0')
+    void start(String name,
+            Collection&lt;BayAreaLocation&gt; previouslyVisited)
+
+    @GetState
+    List&lt;String&gt; getLogHistory()
+}
+</code></pre>
+					<ul>
+						<li class="fragment">flow annotations</li>
+						<li class="fragment">timeouts</li>
+						<li class="fragment">versioning</li>
+						<li class="fragment">workflow entry point</li>
+						<li class="fragment">workflow inputs</li>
+						<li class="fragment">state put on DecisionTaskCompletedEvent</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/graphs/GraphBayAreaTripWorkflow.png">
+					<h3>Workflow Implementation Overview</h3>
+<pre style="opacity:0.6"><code contenteditable>class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
+    @Delegate
+    WorkflowOperations&lt;BayAreaTripActivities> workflowOperations =
+    	SwfWorkflowOperations.of(BayAreaTripActivities)
+    @Override
+    void start(String name,
+    		Collection&lt;BayAreaLocation> previouslyVisited) {
+        Promise&lt;BayAreaLocation> destinationPromise =
+        	determineDestination(previouslyVisited)
+        waitFor(destinationPromise) { BayAreaLocation destination ->
+            waitFor(activities.goTo(name, destination)) {
+                ...
+            }
+        }
+    }
+}
+</code></pre>
+					<ul class="fragment">
+						<li>implementation is decider logic</li>
+						<li>workflowOperations handles workflow concerns</li>
+						<li>@Delegate makes operations available (waitFor, activities)</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/graphs/GraphBayAreaTripWorkflow.png">
+					<h3>Activities Interface</h3>
+<pre style="opacity:0.6"><code contenteditable>@Activities(version = "1.0")
+@ActivityRegistrationOptions(
+        defaultTaskScheduleToStartTimeoutSeconds = -1L,
+        defaultTaskStartToCloseTimeoutSeconds = 300L)
+interface BayAreaTripActivities {
+</code></pre>
+					<ul class="fragment">
+						<li>more flow annotations</li>
+						<li>more timeouts</li>
+						<li>more versioning</li>
+						<li>this time for all activities</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/graphs/GraphBayAreaTripWorkflow.png">
+					<h3>More Activities Interface</h3>
+<pre style="opacity:0.6"><code contenteditable>interface BayAreaTripActivities {
+    @ActivityRegistrationOptions(defaultTaskScheduleToStartTimeoutSeconds = -1L,
+            defaultTaskStartToCloseTimeoutSeconds = 86400L)
+    boolean askYesNoQuestion(String question)
+
+    String goTo(String name, BayAreaLocation location)
+
+    @ActivityRegistrationOptions(defaultTaskScheduleToStartTimeoutSeconds = -1L,
+            defaultTaskStartToCloseTimeoutSeconds = 300L,
+            defaultTaskHeartbeatTimeoutSeconds = 30L)
+    String hike(String somewhere)
+
+    String enjoy(String something)
+
+    String win(String game)
+}
+</code></pre>
+					<ul class="fragment">
+						<li>activity timeout overrides</li>
+						<li>activities correspond to blue ovals</li>
+						<li>activity annotation exists (name and version)</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/graphs/GraphBayAreaTripWorkflow.png">
+					<h3>Activities Implementation Overview</h3>
+<pre style="opacity:0.6"><code contenteditable>class BayAreaTripActivitiesImpl implements BayAreaTripActivities {
+
+    @Delegate ActivityOperations activityOperations =
+        new SwfActivityOperations()
+
+    @Override
+    String goTo(String name, BayAreaLocation location) {
+        "${name} went to ${location}."
+    }
+    ...
+}
+</code></pre>
+					<ul class="fragment">
+						<li>activities are POGOs (even POJOs)</li>
+						<li>dependencies can be injected</li>
+						<li>activityOperations handles activity concerns</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/3719867208_f80b78affb_b.jpg" data-transition="zoom">
+					<img style="opacity:0.6" src="lib/img/graphs/GraphBayAreaTripWorkflow.png">
+					<h3>Choosing a location</h3>
+				</section>
+
+				<section data-background="lib/img/8356208118_5a25d5ba44_o.png" data-transition="zoom">
+					<img style="opacity:0.6" src="lib/img/graphs/location.png">
+				</section>
+
+				<section data-background="lib/img/graphs/location.png">
+					<h3>Workflow Implementation</h3>
+					<p>determine location</p>
+<pre style="opacity:0.6"><code contenteditable>Promise&lt;BayAreaLocation> determineDestination(previouslyVisited) {
+  if (!previouslyVisited.contains(BayAreaLocation.GoldenGateBridge)) {
+    return promiseFor(BayAreaLocation.GoldenGateBridge)
+  }
+  if (!previouslyVisited.contains(BayAreaLocation.Redwoods)) {
+    return promiseFor(BayAreaLocation.Redwoods)
+  } else {
+    waitFor(activities.askYesNoQuestion('Like roller coasters?')) {
+            boolean isThrillSeeker ->
+        if (isThrillSeeker) {
+            return promiseFor(BayAreaLocation.Boardwalk)
+        }
+        promiseFor(BayAreaLocation.Monterey)
+    }
+  }
+}
+</code></pre>
+					<ul class="fragment">
+						<li>askYesNoQuestion is an activity</li>
+						<li>returns promise since some results depend on activity</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/graphs/location.png">
+					<h3>Activities Implementation</h3>
+					<p>determine location</p>
+<pre style="opacity:0.6"><code contenteditable>@ManualActivityCompletion
+boolean askYesNoQuestion(String question) {
+    sendManualActivityCompletionInfo(taskToken, workflowExecution)
+    true
+}
+</code></pre>
+					<ul class="fragment">
+						<li>activityOperations supplies taskToken and workflowExecution</li>
+						<li>@ManualActivityCompletion - result supplied manually</li>
+						<li>does not matter what is returned here</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/3719867208_f80b78affb_b.jpg" data-transition="zoom">
+					<img style="opacity:0.6" src="lib/img/graphs/GraphBayAreaTripWorkflow.png">
+					<h3>Golden Gate Bridge</h3>
+				</section>
+
+				<section data-transition="zoom" data-background="lib/img/9106122985_10a7e3fb85_o.jpg">
+					<img style="opacity:0.6" src="lib/img/graphs/bridge.png">
+				</section>
+
+				<section data-background="lib/img/graphs/bridge.png">
+					<h3>Workflow History</h3>
+					<ul>
+						<li><a href="lib/AsgardScreens/bridge/bridge.json">JSON view</a></li>
+						<li><a href="lib/AsgardScreens/bridge/Execution%20History%20Bridge.html">execution history</a></li>
+						<li><a href="lib/AsgardScreens/bridge/Task%20Bridge.html">task history</a></li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/graphs/bridge.png">
+					<h3>Workflow Implementation</h3>
+					<p>at bridge</p>
+<pre style="opacity:0.6"><code contenteditable>private Promise&lt;Void> doAtBridge() {
+    waitFor(activities.hike('across the bridge')) { status it }
+}
+</code></pre>
+				</section>
+
+				<section data-background="lib/img/graphs/bridge.png">
+					<h3>Activities Implementation</h3>
+					<p>at bridge</p>
+<pre style="opacity:0.6"><code contenteditable>String hike(String somewhere) {
+    int stepsTaken = 0
+    int totalStepsForHike = getHikeLengthInSteps(somewhere)
+    while (stepsTaken &lt; totalStepsForHike) {
+        recordHeartbeat("Took ${++stepsTaken} steps.")
+    }
+    "And hiked ${somewhere}."
+}
+</code></pre>
+					<ul class="fragment">
+						<li>recordHeartbeat is a pulse for the workflow</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/3719867208_f80b78affb_b.jpg" data-transition="zoom">
+					<img style="opacity:0.6" src="lib/img/graphs/GraphBayAreaTripWorkflow.png">
+					<h3>Redwoods</h3>
+				</section>
+
+				<section data-transition="zoom" data-background="lib/img/3040339482_aa26bd43e7_o.jpg">
+					<img style="opacity:0.6" src="lib/img/graphs/redwoods.png">
+					<div><ul class="fragment">
+						<li>timers</li>
+					</ul></div>
+				</section>
+
+				<section data-background="lib/img/graphs/redwoods.png">
+					<h3>Workflow History</h3>
+					<ul>
+						<li><a href="lib/AsgardScreens/redwood/redwood.json">JSON view</a></li>
+						<li><a href="lib/AsgardScreens/redwood/Execution%20History%20Redwood.html">execution history</a></li>
+						<li><a href="lib/AsgardScreens/redwood/Task%20Redwood.html">task history</a></li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/graphs/redwoods.png">
+					<h3>Workflow Implementation</h3>
+					<p>at redwoods</p>
+<pre style="opacity:0.6"><code contenteditable>private Promise&lt;Void> doAtRedwoods() {
+    status 'And stretched for 10 seconds before hiking.'
+    waitFor(timer(10)) {
+        DoTry&lt;String> hiking = doTry {
+            promiseFor(activities.hike('through redwoods'))
+        }
+        DoTry&lt;Void> countDown = cancellableTimer(30)
+        waitFor(anyPromises(countDown.getResult(), hiking.getResult())) {
+            if (hiking.getResult().isReady()) {
+                countDown.cancel(null)
+                status "${hiking.getResult().get()}"
+            } else {
+                hiking.cancel(null)
+                status 'And ran out of time when hiking.'
+            }
+        }
+    }
+}
+</code></pre>
+					<ul class="fragment">
+						<li>timer fires, then do something</li>
+						<li>do things and stop when ANY one finishes</li>
+						<li>DoTry allows us to cancel other activity</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/3719867208_f80b78affb_b.jpg" data-transition="zoom">
+					<img style="opacity:0.6" src="lib/img/graphs/GraphBayAreaTripWorkflow.png">
+					<h3>Santa Cruz Boardwalk</h3>
+				</section>
+
+				<section data-transition="none" data-background="lib/img/9180204050_7351febd17_o.jpg">
+					<img style="opacity:0.6" src="lib/img/graphs/boardwalk.png">
+					<div><ul>
+					</ul></div>
+				</section>
+
+				<section data-transition="none" data-background="lib/img/9191290392_f2fce80106_k.jpg">
+					<img style="opacity:0.6" src="lib/img/graphs/boardwalk.png">
+					<div><ul>
+						<li>retry</li>
+					</ul></div>
+				</section>
+
+				<section data-transition="none" data-background="lib/img/3999957159_aff3e85615_o.jpg">
+					<img style="opacity:0.6" src="lib/img/graphs/boardwalk.png">
+					<div><ul>
+						<li>retry</li>
+					</ul></div>
+				</section>
+
+				<section data-background-transition="zoom" data-background="lib/img/graphs/boardwalk.png">
+					<h3>Workflow Implementation</h3>
+					<p>at boardwalk</p>
+<pre style="opacity:0.6"><code contenteditable>private Promise&lt;Void> doAtBoardwalk() {
+    int numberOfTokensGiven = 3
+    int numberOfTokens = numberOfTokensGiven
+    RetryPolicy retryPolicy = new ExponentialRetryPolicy(60).
+            withMaximumAttempts(numberOfTokens).
+            withExceptionsToRetry([IllegalStateException])
+    DoTry&lt;String> tryToWin = doTry {
+        return retry(retryPolicy) {
+            numberOfTokens--
+            promiseFor(activities.win('a carnival game'))
+        }
+    } withCatch { Throwable e ->
+        return promiseFor("${e.message} ${numberOfTokensGiven} times.")
+    }
+    ...
+</code></pre>
+					<ul class="fragment">
+						<li>Flow RetryPolicy</li>
+						<li>withCatch catches last exception</li>
+					</ul>
+				</section>
+
+				<section data-background-transition="zoom" data-background="lib/img/graphs/boardwalk.png">
+					<h3>Workflow Implementation</h3>
+					<p>at boardwalk</p>
+<pre style="opacity:0.6"><code contenteditable>    ...
+    waitFor(tryToWin.result) {
+        status it
+        if (numberOfTokens > 0) {
+            waitFor(activities.enjoy('a roller coaster')) { status it }
+        }
+        Promise.Void()
+    }
+}
+</code></pre>
+				</section>
+
+				<section data-background="lib/img/graphs/boardwalk.png">
+					<h3>Activities Implementation</h3>
+					<p>at boardwalk</p>
+<pre style="opacity:0.6"><code contenteditable>String win(String game) {
+    if (isWinner()) {
+        return "And won ${game}."
+    } else {
+        throw new IllegalStateException("And lost ${game}.")
+    }
+}
+</code></pre>
+					<ul class="fragment">
+						<li>win throws exception for retry</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/3719867208_f80b78affb_b.jpg" data-transition="zoom">
+					<img style="opacity:0.6" src="lib/img/graphs/GraphBayAreaTripWorkflow.png">
+					<h3>Monterey Bay</h3>
+				</section>
+
+				<section data-transition="none" data-background="lib/img/7802971738_9fcc6d2f12_k.jpg">
+					<img style="opacity:0.6" src="lib/img/graphs/monterey.png">
+				</section>
+
+				<section data-transition="none" data-background="lib/img/8903693948_6fbe2cb769_o.jpg">
+					<img style="opacity:0.6" src="lib/img/graphs/monterey.png">
+				</section>
+
+				<section data-transition="none" data-background="lib/img/5180454265_6487b025c3_o.jpg">
+					<img style="opacity:0.6" src="lib/img/graphs/monterey.png">
+				</section>
+
+				<section data-transition="none" data-background="lib/img/7484823146_c754754f2c_o.jpg">
+					<img style="opacity:0.6" src="lib/img/graphs/monterey.png">
+				</section>
+
+				<section data-transition="none" data-background="lib/img/6745688805_14d440cccd_b.jpg">
+					<img style="opacity:0.6" src="lib/img/graphs/monterey.png">
+				</section>
+
+				<section data-background="lib/img/graphs/monterey.png">
+					<h3>Workflow Implementation</h3>
+					<p>at Monterey</p>
+<pre style="opacity:0.6"><code contenteditable>private Promise&lt;Void> doAtMonterey() {
+  Promise&lt;String> eating = promiseFor(activities.enjoy('eating seafood'))
+  Promise&lt;String> watching = promiseFor(activities.enjoy('watching sea lions'))
+  waitFor(allPromises(eating, watching)) {
+    status "${eating.get()} ${watching.get()}"
+    doTry {
+      promiseFor(activities.enjoy('looking for sea glass on the beach'))
+    } withCatch { Throwable t ->
+      status t.message
+      promiseFor(activities.enjoy('the aquarium'))
+    } withFinally { String result ->
+      status result
+      waitFor(activities.enjoy('the 17-Mile Drive')) { status it }
+    }
+    Promise.Void()
+  }
+}
+</code></pre>
+					<ul class="fragment">
+						<li>allPromises</li>
+						<li>try, catch, and finally (distributed)</li>
+						<li>finally closure gets result (from try or catch)</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+					<h1>Implementation of Glisten</h1>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+					<h3>Glisten SWF Implementation</h3>
+<pre style="opacity:0.6"><code contenteditable>class SwfWorkflowOperations&lt;A> extends WorkflowOperations&lt;A> {
+    A getActivities() {
+        AsyncCaller.of(activitiesType, activitySchedulingOptions)
+    }
+
+    &lt;T> Promise&lt;T> waitFor(Promise promise, Closure&lt;Promise&lt;T>> work) {
+        new Functor([promise] as Promise[]) {
+            protected Promise doExecute() {
+                work(promise.get())
+            }
+        }
+    }
+    ...
+</code></pre>
+					<ul class="fragment">
+						<li>AsyncCaller</li>
+						<li>Functor is a Flow class</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+					<h3>Glisten SWF Implementation</h3>
+<pre style="opacity:0.6"><code contenteditable>class AsyncCaller&lt;T> {
+    final Class&lt;T> type
+    final DynamicActivitiesClient dynamicActivitiesClient
+
+    def methodMissing(String name, args) {
+        Activities activities = reflectionHelper.
+            findAnnotationOnClass(Activities)
+        Method method = reflectionHelper.
+            findMethodForNameAndArgsOrFail(name, args as List)
+        ActivityType activityType = new ActivityType(
+            name: "${type.simpleName}.${method.name}",
+            version: activities?.version())
+        List&lt;Promise> promises = args.collect { Promise.asPromise(it) }
+        return dynamicActivitiesClient.scheduleActivity(activityType,
+            promises as Promise[], method.returnType)
+    }
+}
+</code></pre>
+					<ul class="fragment">
+						<li>DynamicActivitiesClient is a Flow class</li>
+						<li>use reflection to get activity name and version from annotations</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+					<h3>Glisten Local Implementation</h3>
+<pre style="opacity:0.6"><code contenteditable>class LocalWorkflowOperations&lt;A> extends WorkflowOperations&lt;A> {
+    final A activities
+
+    &lt;T> Promise&lt;T> waitFor(Promise promise, Closure&lt;Promise&lt;T>> work) {
+        if (promise.isReady()) {
+            return work(promise.get())
+        }
+        new Settable()
+    }
+    ...
+</code></pre>
+					<ul class="fragment">
+						<li>regular activities reference</li>
+						<li>promise.isReady()</li>
+					</ul>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+					<h3>Activities Unit Tests</h3>
+<pre style="opacity:0.6"><code contenteditable>class BayAreaTripActivitiesSpec extends Specification {
+    ActivityOperations mockActivity = Mock(ActivityOperations)
+    BayAreaTripActivitiesImpl bayAreaTripActivities =
+        new BayAreaTripActivitiesImpl(
+            activity: mockActivity,
+            hikeNameToLengthInSteps: ['there': 3])
+
+    def 'should hike'() {
+        when: String expectedResult = bayAreaTripActivities.hike('there')
+        
+        then: expectedResult == 'And hiked there.'
+        then: mockActivity.recordHeartbeat('Took 1 steps.')
+        then: mockActivity.recordHeartbeat('Took 2 steps.')
+        then: mockActivity.recordHeartbeat('Took 3 steps.')
+    }
+}
+</code></pre>
+				</section>
+
+				<section data-background="lib/img/110394524_8dbc5b9cc7_o.jpg">
+					<h3>Workflow Unit Tests</h3>
+<pre style="opacity:0.6"><code contenteditable>class BayAreaTripWorkflowSpec extends Specification {
+    BayAreaTripActivities mockActivities = Mock(BayAreaTripActivities)
+    BayAreaTripWorkflow workflow = new BayAreaTripWorkflowImpl(
+        workflow: LocalWorkflowOperations.of(mockActivities))
+
+    def 'should go to Golden Gate Bridge'() {
+        when: workflow.start('Clay', [])
+
+        then:
+        workflow.logHistory == ['Clay went to the Golden Gate Bridge.',
+                                'And hiked across the bridge.']
+        then: 1 * mockActivities.goTo('Clay', BayAreaLocation.GoldenGateBridge) >> 'Clay went to the Golden Gate Bridge.'
+        then: 1 * mockActivities.hike('across the bridge') >> 'And hiked across the bridge.'
+    }
+}
+</code></pre>
+				</section>
+
+				<section>
+					<h2>Show Asgard's use of SWF</h2>
+					<p><a href="http://www.youtube.com/watch?v=wY49LuXfwH0">Asgard Show Episode 2 (30:45 - 38:30)</a></p>
+				</section>
+
+				<section data-background="lib/img/3049035064_d5be80cb28_o.jpg">
+					<h2>Questions</h2>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>

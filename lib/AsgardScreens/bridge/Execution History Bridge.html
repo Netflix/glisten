@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<!-- saved from url=(0142)http://nactest/workflowExecution/show?runId=127bFoewUgplRb5gYB9Vvl6HAO3Ihz0FXIqXJP1kz%2FGpU%3D&workflowId=92e58553-9f53-42ca-945b-30c8a7a4ba36 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Execution History</title>
+</head>
+<body class="test ">
+  
+<div class="body">
+  <h1>Workflow Execution History</h1>
+  <table>
+    <tbody><tr class="prop">
+      <td class="name">Tags:</td>
+      <td class="value">[{"desc":"Clay is taking a trip in the Bay Area."}, {"user":{"ticket":null,"username":"cmccoy","clientHostName":"localhost","clientIpAddress":"0:0:0:0:0:0:0:1%0","region":"US_WEST_1","internalAutomation":false}}]</td>
+    </tr>
+    <tr class="prop">
+      <td class="name">Workflow ID:</td>
+      <td class="value">92e58553-9f53-42ca-945b-30c8a7a4ba36</td>
+    </tr>
+    <tr class="prop">
+      <td class="name">Run ID:</td>
+      <td class="value">127bFoewUgplRb5gYB9Vvl6HAO3Ihz0FXIqXJP1kz/GpU=</td>
+    </tr>
+  </tbody></table>
+  <div class="list">
+    <table class="sortable">
+      <thead>
+      <tr>
+        <th>Event</th>
+        <th>Scheduled</th>
+        <th>Elapsed Time</th>
+        <th>Event Type</th>
+        <th>Version</th>
+        <th>Name</th>
+        <th>Input/Result/Context</th>
+        <th>Identity</th>
+      </tr>
+      </thead>
+      <tbody>
+      
+        <tr class="odd">
+          <td>1</td>
+          <td></td>
+          <td>+0s</td>
+          <td>WorkflowExecutionStarted</td>
+          <td>1.0</td>
+          <td>BayAreaTripWorkflow.start</td>
+          <td>["[Ljava.lang.Object;",["Clay",["java.util.ArrayList",[]]]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>2</td>
+          <td></td>
+          <td>+0s</td>
+          <td>DecisionTaskScheduled</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>3</td>
+          <td>2</td>
+          <td>+0s</td>
+          <td>DecisionTaskStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td>45379@lgmac-cmccoy2</td>
+        </tr>
+      
+        <tr class="even">
+          <td>4</td>
+          <td>2</td>
+          <td>+0s</td>
+          <td>DecisionTaskCompleted</td>
+          <td></td>
+          <td></td>
+          <td>["java.util.ArrayList",[]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>5</td>
+          <td></td>
+          <td>+0s</td>
+          <td>ActivityTaskScheduled</td>
+          <td>1.0</td>
+          <td>BayAreaTripActivities.goTo</td>
+          <td>["[Ljava.lang.Object;",["Clay",["com.netflix.asgard.flow.example.trip.BayAreaLocation","GoldenGateBridge"]]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>6</td>
+          <td>5</td>
+          <td>+1s</td>
+          <td>ActivityTaskStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td>45379@lgmac-cmccoy2</td>
+        </tr>
+      
+        <tr class="odd">
+          <td>7</td>
+          <td>5</td>
+          <td>+1s</td>
+          <td>ActivityTaskCompleted</td>
+          <td></td>
+          <td></td>
+          <td>"Clay went to the Golden Gate Bridge."<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>8</td>
+          <td></td>
+          <td>+1s</td>
+          <td>DecisionTaskScheduled</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>9</td>
+          <td>8</td>
+          <td>+1s</td>
+          <td>DecisionTaskStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td>45379@lgmac-cmccoy2</td>
+        </tr>
+      
+        <tr class="even">
+          <td>10</td>
+          <td>8</td>
+          <td>+1s</td>
+          <td>DecisionTaskCompleted</td>
+          <td></td>
+          <td></td>
+          <td>["java.util.ArrayList",["Clay went to the Golden Gate Bridge."]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>11</td>
+          <td></td>
+          <td>+1s</td>
+          <td>ActivityTaskScheduled</td>
+          <td>1.0</td>
+          <td>BayAreaTripActivities.hike</td>
+          <td>["[Ljava.lang.Object;",["across the bridge"]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>12</td>
+          <td>11</td>
+          <td>+1s</td>
+          <td>ActivityTaskStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td>45379@lgmac-cmccoy2</td>
+        </tr>
+      
+        <tr class="odd">
+          <td>13</td>
+          <td>11</td>
+          <td>+12s</td>
+          <td>ActivityTaskCompleted</td>
+          <td></td>
+          <td></td>
+          <td>"And hiked across the bridge."<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="even">
+          <td>14</td>
+          <td></td>
+          <td>+12s</td>
+          <td>DecisionTaskScheduled</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>15</td>
+          <td>14</td>
+          <td>+13s</td>
+          <td>DecisionTaskStarted</td>
+          <td></td>
+          <td></td>
+          <td><span class="error"></span></td>
+          <td>45379@lgmac-cmccoy2</td>
+        </tr>
+      
+        <tr class="even">
+          <td>16</td>
+          <td>14</td>
+          <td>+13s</td>
+          <td>DecisionTaskCompleted</td>
+          <td></td>
+          <td></td>
+          <td>["java.util.ArrayList",["Clay went to the Golden Gate Bridge.","And hiked across the bridge."]]<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+        <tr class="odd">
+          <td>17</td>
+          <td></td>
+          <td>+13s</td>
+          <td>WorkflowExecutionCompleted</td>
+          <td></td>
+          <td></td>
+          <td>null<span class="error"></span></td>
+          <td></td>
+        </tr>
+      
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  <script type="text/javascript">
+    window.browserGlobalsFromServer = {
+      groupResizeDefaultBatchSize: 500,
+      params: {
+  "workflowId": "92e58553-9f53-42ca-945b-30c8a7a4ba36",
+  "runId": "127bFoewUgplRb5gYB9Vvl6HAO3Ihz0FXIqXJP1kz/GpU=",
+  "action": "show",
+  "controller": "workflowExecution"
+},
+      region: 'us-west-1',
+      requireLoginForEdit: true
+    };
+  </script>
+  <script type="text/javascript" src="./Execution History Bridge_files/jquery.js"></script>
+  <script defer="" type="text/javascript" src="./Execution History Bridge_files/select2.min.js"></script>
+  <script defer="" type="text/javascript" src="./Execution History Bridge_files/custom.js"></script>
+  
+
+
+
+
+</body></html>
