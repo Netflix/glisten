@@ -1,4 +1,4 @@
-Glisten is an ease of use Groovy library for building JVM applications with [Amazon Simple Workflow Service (SWF)](http://aws.amazon.com/swf)
+Glisten is an ease of use [Groovy](http://groovy.codehaus.org) library for building JVM applications with [Amazon Simple Workflow Service (SWF)](http://aws.amazon.com/swf)
 
 [![Build Status](https://netflixoss.ci.cloudbees.com/job/glisten-master/badge/icon)](https://netflixoss.ci.cloudbees.com/job/glisten-master/)
 
