@@ -92,9 +92,17 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
 
     @Override
     protected void doCatch(Throwable e) throws Throwable {
-        result.unchain()
+        // It seems unlikely that the result would be ready and we would be in this catch block, but I have seen it
+        // happen when a doTry wraps a retry and uses its result. You can't unchain if the result is ready. So to play
+        // it safe, we worry about overriding the result with the catch block result in this case.
+        boolean isChainable = !result.isReady()
+        if (isChainable) {
+            result.unchain()
+        }
         def blockResult = catchBlock(e)
-        result.chain(wrapWithPromise(blockResult))
+        if (isChainable) {
+            result.chain(wrapWithPromise(blockResult))
+        }
     }
 
     @Override
