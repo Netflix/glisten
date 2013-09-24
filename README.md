@@ -1,14 +1,20 @@
-## DESCRIPTION
-
-Glisten is an ease of use Groovy library for building JVM applications with Amazon Simple Workflow (Amazon SWF)
+Glisten is an ease of use Groovy library for building JVM applications with [Amazon Simple Workflow Service (SWF)](http://aws.amazon.com/swf)
 
 [![Build Status](https://netflixoss.ci.cloudbees.com/job/glisten-master/badge/icon)](https://netflixoss.ci.cloudbees.com/job/glisten-master/)
 
-## DETAILS
+## Documentation
 
 Please see the [wiki](https://github.com/Netflix/glisten/wiki).
 
-## LICENSE
+## Build
+
+```
+$ git clone git@github.com:Netflix/RxJava.git
+$ cd RxJava/
+$ ./gradlew build
+```
+
+## License
 
 Copyright 2012 Netflix, Inc.
 
