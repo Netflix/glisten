@@ -4,7 +4,12 @@ Glisten is an ease of use [Groovy](http://groovy.codehaus.org) library for build
 
 ## Documentation
 
-Please see the [wiki](https://github.com/Netflix/glisten/wiki).
+* [wiki](https://github.com/Netflix/glisten/wiki).
+* slides from talk at [SpringOne 2013](http://www.springone2gx.com/conference/santa_clara/2013/09/session?id=29389)
+```
+$ git clone -b groovySwf https://github.com/claymccoy/reveal.js.git
+$ open reveal.js/index.html
+```
 
 ## Build
 
