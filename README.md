@@ -9,8 +9,8 @@ Please see the [wiki](https://github.com/Netflix/glisten/wiki).
 ## Build
 
 ```
-$ git clone git@github.com:Netflix/RxJava.git
-$ cd RxJava/
+$ git clone git@github.com:Netflix/glisten.git
+$ cd glisten/
 $ ./gradlew build
 ```
 
