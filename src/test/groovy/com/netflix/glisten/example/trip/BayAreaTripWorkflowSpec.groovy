@@ -34,7 +34,8 @@ class BayAreaTripWorkflowSpec extends Specification {
                 'And hiked across the bridge.'
         ]
         0 * _
-        then: 1 * mockActivities.goTo('Clay', BayAreaLocation.GoldenGateBridge) >> 'Clay went to the Golden Gate Bridge.'
+        then: 1 * mockActivities.goTo('Clay', BayAreaLocation.GoldenGateBridge) >>
+                'Clay went to the Golden Gate Bridge.'
         then: 1 * mockActivities.hike('across the bridge') >> 'And hiked across the bridge.'
     }
 
@@ -120,7 +121,8 @@ class BayAreaTripWorkflowSpec extends Specification {
             1 * enjoy('eating seafood') >> 'And enjoyed eating seafood.'
             1 * enjoy('watching sea lions') >> 'And enjoyed watching sea lions.'
         }
-        then: 1 * mockActivities.enjoy('looking for sea glass on the beach') >> 'And enjoyed looking for sea glass on the beach.'
+        then: 1 * mockActivities.enjoy('looking for sea glass on the beach') >>
+                'And enjoyed looking for sea glass on the beach.'
         then: 1 * mockActivities.enjoy('the 17-Mile Drive') >> 'And enjoyed the 17-Mile Drive.'
     }
 

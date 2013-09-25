@@ -20,9 +20,6 @@ import com.amazonaws.services.simpleworkflow.flow.DynamicWorkflowClientExternal
 import com.amazonaws.services.simpleworkflow.flow.ManualActivityCompletionClient
 import com.amazonaws.services.simpleworkflow.flow.WorkflowClientExternal
 import com.amazonaws.services.simpleworkflow.model.WorkflowExecution
-import com.netflix.glisten.InterfaceBasedWorkflowClient
-import com.netflix.glisten.WorkflowClientExternalToWorkflowInterfaceAdapter
-import com.netflix.glisten.WorkflowClientFactory
 import com.netflix.glisten.example.trip.BayAreaTripWorkflow
 import spock.lang.Specification
 

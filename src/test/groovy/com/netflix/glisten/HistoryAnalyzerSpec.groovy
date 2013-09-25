@@ -20,8 +20,6 @@ import com.amazonaws.services.simpleworkflow.model.DecisionTaskCompletedEventAtt
 import com.amazonaws.services.simpleworkflow.model.HistoryEvent
 import com.amazonaws.services.simpleworkflow.model.WorkflowExecutionFailedEventAttributes
 import com.amazonaws.services.simpleworkflow.model.WorkflowExecutionStartedEventAttributes
-import com.netflix.glisten.HistoryAnalyzer
-import com.netflix.glisten.LogMessage
 import spock.lang.Specification
 
 class HistoryAnalyzerSpec extends Specification {

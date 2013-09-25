@@ -18,7 +18,6 @@ package com.netflix.glisten
 import com.amazonaws.services.simpleworkflow.flow.annotations.Execute
 import com.amazonaws.services.simpleworkflow.flow.annotations.GetState
 import com.amazonaws.services.simpleworkflow.flow.annotations.WorkflowRegistrationOptions
-import com.netflix.glisten.ReflectionHelper
 import com.netflix.glisten.example.trip.BayAreaTripWorkflow
 import java.lang.reflect.Method
 import spock.lang.Specification

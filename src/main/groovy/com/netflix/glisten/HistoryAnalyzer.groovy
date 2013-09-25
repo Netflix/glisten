@@ -75,7 +75,7 @@ class HistoryAnalyzer {
      * @return the number of seconds from the start of the workflow until this event occurred
      */
     long getElapsedSeconds(HistoryEvent event) {
-        (event.eventTimestamp.time - events[0].eventTimestamp.time)/1000
+        (event.eventTimestamp.time - events[0].eventTimestamp.time) / 1000
     }
 }
 

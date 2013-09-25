@@ -75,6 +75,7 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
         recursingRetry(retryPolicy, work, maximumAttempts, 1)
     }
 
+    @SuppressWarnings('CatchThrowable')
     private <T> Promise<T> recursingRetry(RetryPolicy retryPolicy, Closure<? extends Promise<T>> work,
             int maximumAttempts, int attemptCount, Throwable t1 = null) {
         if (maximumAttempts > 0 && attemptCount > maximumAttempts) {
@@ -83,7 +84,7 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
         if (!t1 || retryPolicy.isRetryable(t1)) {
             try {
                 return work()
-            } catch(Throwable t2) {
+            } catch (Throwable t2) {
                 recursingRetry(retryPolicy, work, maximumAttempts, attemptCount + 1, t2)
             }
         } else {

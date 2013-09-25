@@ -34,7 +34,8 @@ import groovy.transform.Canonical
 @Canonical
 class SwfWorkflowOperations<A> extends WorkflowOperations<A> {
 
-    static <T> SwfWorkflowOperations<T> of(Class<T> activitiesType, ActivitySchedulingOptions activitySchedulingOptions = null) {
+    static <T> SwfWorkflowOperations<T> of(Class<T> activitiesType,
+            ActivitySchedulingOptions activitySchedulingOptions = null) {
         new SwfWorkflowOperations<T>(activitiesType, activitySchedulingOptions)
     }
 
@@ -43,8 +44,10 @@ class SwfWorkflowOperations<A> extends WorkflowOperations<A> {
 
     private DecisionContext overrideDecisionContext
 
+    @SuppressWarnings('PrivateFieldCouldBeFinal')
     @Lazy private DecisionContextProvider contextProvider = new DecisionContextProviderImpl()
-    @Lazy private DecisionContext decisionContext = overrideDecisionContext?: contextProvider.getDecisionContext()
+    @SuppressWarnings('PrivateFieldCouldBeFinal')
+    @Lazy private DecisionContext decisionContext = overrideDecisionContext ?: contextProvider.decisionContext
 
     @Override
     A getActivities() {
@@ -89,7 +92,7 @@ class SwfWorkflowOperations<A> extends WorkflowOperations<A> {
         Settable<T> result = new Settable<T>()
         executor.execute(new AsyncRunnable() {
             @Override
-            public void run() throws Throwable {
+            void run() throws Throwable {
                 result.unchain()
                 result.chain(work())
             }

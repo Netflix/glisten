@@ -26,7 +26,7 @@ import groovy.transform.Canonical
 class EventAttributes {
     final HistoryEvent event
 
-    private def getEventDetails() {
+    private getEventDetails() {
         event.properties.find { String name, value ->
             name.endsWith('EventAttributes') && value
         }.value

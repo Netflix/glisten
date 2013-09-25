@@ -36,7 +36,7 @@ class SwfWorkflowSpec extends Specification {
         boolean workWasDone = false
 
         when:
-        Promise<String> result = workflow.waitFor(Promise.asPromise('ready')) {
+        workflow.waitFor(Promise.asPromise('ready')) {
             workWasDone = true
             Promise.asPromise('test')
         }
@@ -59,7 +59,7 @@ class SwfWorkflowSpec extends Specification {
         boolean finallyWasDone = false
 
         when:
-        DoTry<String> doTry = workflow.doTry {
+        workflow.doTry {
             workWasDone = true
             Settable<String> notReady = new Settable('tried')
             notReady.ready = false

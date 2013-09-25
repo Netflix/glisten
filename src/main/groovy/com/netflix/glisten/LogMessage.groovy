@@ -26,6 +26,6 @@ class LogMessage {
     String text
 
     String toString() {
-        "${timestamp.format("yyyy-MM-dd_HH:mm:ss")} ${text}"
+        "${timestamp.format('yyyy-MM-dd_HH:mm:ss')} ${text}"
     }
 }

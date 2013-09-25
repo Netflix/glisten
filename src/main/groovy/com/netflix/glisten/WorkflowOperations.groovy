@@ -86,6 +86,7 @@ abstract class WorkflowOperations<A> {
      * @param work is a Closure that has the actual result of the waited on promise passed in
      * @return a promised result of the work
      */
+    @SuppressWarnings('UnnecessaryPublicModifier')
     public <T> Promise<T> waitFor(Object activityResult, Closure<? extends Promise<T>> work) {
         waitFor(promiseFor(activityResult), work)
     }
@@ -131,7 +132,7 @@ abstract class WorkflowOperations<A> {
      * @return a DoTry whose result will be ready when the timer is done
      */
     DoTry<Void> cancellableTimer(long delaySeconds) {
-        doTry() {
+        doTry {
             timer(delaySeconds)
         } withCatch { Throwable t ->
             if (t instanceof CancellationException) {
@@ -156,6 +157,7 @@ abstract class WorkflowOperations<A> {
      * @param work to do
      * @return a promised result of the work
      */
+    @SuppressWarnings('UnnecessaryPublicModifier')
     public <T> Promise<T> retry(Closure<? extends Promise<T>> work) {
         retry(new ExponentialRetryPolicy(1L), work)
     }

@@ -33,7 +33,7 @@ class WorkflowMetaAttributes {
      */
     WorkflowType getWorkflowType() {
         Execute execute = null
-        Method method = type.getMethods().find { method ->
+        Method method = type.methods.find { method ->
             method.declaredAnnotations.find {
                 if (it.annotationType() == Execute) {
                     execute = (Execute) it

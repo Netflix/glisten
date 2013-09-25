@@ -21,7 +21,8 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.ActivityRegistrati
 /**
  * SWF activities for the BayAreaTripWorkflow example.
  */
-@Activities(version = "1.0")
+
+@Activities(version = '1.0')
 @ActivityRegistrationOptions(defaultTaskScheduleToStartTimeoutSeconds = -1L,
         defaultTaskStartToCloseTimeoutSeconds = 300L)
 interface BayAreaTripActivities {
