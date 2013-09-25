@@ -5,12 +5,11 @@ dependencies {
 codenarcMain {
     configFile = file('codequality/codenarcMain.groovy')
 }
-
 codenarcTest {
     configFile = file('codequality/codenarcTest.groovy')
 }
 codenarc {
-	reportFormat = 'xml'
+	reportFormat = 'html'
 }
 
 apply plugin: 'cobertura'
