@@ -30,7 +30,7 @@ class SwfActivityOperations implements ActivityOperations {
     @Override
     void recordHeartbeat(String message) {
         provider.activityExecutionContext.recordActivityHeartbeat(message)
-        println 'Should break rule!!!'
+        println 'Should break rule!!!!'
     }
 
     @Override
