@@ -10,7 +10,7 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.WorkflowRegistrati
  */
 @Workflow
 @WorkflowRegistrationOptions(defaultExecutionStartToCloseTimeoutSeconds = 60L)
-public interface BayAreaTripWorkflow {
+interface BayAreaTripWorkflow {
 
     /**
      * Start the workflow. The Execute annotation indicates that this it the entry point of the workflow.

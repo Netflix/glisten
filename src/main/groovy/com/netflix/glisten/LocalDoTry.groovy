@@ -21,6 +21,7 @@ import com.amazonaws.services.simpleworkflow.flow.core.Settable
 /**
  * Local implementation sufficient to run unit tests without a real SWF dependency.
  */
+@SuppressWarnings('CatchException')
 class LocalDoTry implements DoTry {
 
     private Exception error

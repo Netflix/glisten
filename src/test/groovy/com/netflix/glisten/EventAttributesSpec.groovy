@@ -19,7 +19,6 @@ import com.amazonaws.services.simpleworkflow.model.ActivityTaskCompletedEventAtt
 import com.amazonaws.services.simpleworkflow.model.DecisionTaskCompletedEventAttributes
 import com.amazonaws.services.simpleworkflow.model.HistoryEvent
 import com.amazonaws.services.simpleworkflow.model.WorkflowExecutionStartedEventAttributes
-import com.netflix.glisten.EventAttributes
 import spock.lang.Specification
 
 class EventAttributesSpec extends Specification {

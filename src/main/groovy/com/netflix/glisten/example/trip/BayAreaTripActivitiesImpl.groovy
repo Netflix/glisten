@@ -19,6 +19,7 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.ManualActivityComp
 import com.amazonaws.services.simpleworkflow.model.WorkflowExecution
 import com.netflix.glisten.ActivityOperations
 import com.netflix.glisten.SwfActivityOperations
+import java.security.SecureRandom
 
 /**
  * SWF activity implementations for the BayAreaTripWorkflow example.
@@ -31,7 +32,7 @@ class BayAreaTripActivitiesImpl implements BayAreaTripActivities {
     Map<String, Integer> hikeNameToLengthInSteps = [:]
 
     // In a real ActivitiesImpl this would probably be an injected service
-    Closure<Boolean> isWinner = { new Random().nextBoolean() }
+    Closure<Boolean> isWinner = { new SecureRandom().nextBoolean() }
 
     @Override
     String goTo(String name, BayAreaLocation location) {
@@ -57,9 +58,8 @@ class BayAreaTripActivitiesImpl implements BayAreaTripActivities {
     String win(String game) {
         if (isWinner()) {
             return "And won ${game}."
-        } else {
-            throw new IllegalStateException("And lost ${game}.")
         }
+        throw new IllegalStateException("And lost ${game}.")
     }
 
     @ManualActivityCompletion
@@ -69,6 +69,7 @@ class BayAreaTripActivitiesImpl implements BayAreaTripActivities {
         true // does not matter what is returned here because the result will be supplied manually
     }
 
+    @SuppressWarnings(['EmptyMethod', 'UnusedPrivateMethodParameter'])
     private void sendManualActivityCompletionInfo(String taskToken, WorkflowExecution workflowExecution) {
         // send info needed to complete task manually
     }

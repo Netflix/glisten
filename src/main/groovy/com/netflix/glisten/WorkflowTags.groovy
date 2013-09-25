@@ -51,6 +51,7 @@ class WorkflowTags {
         this
     }
 
+    @SuppressWarnings('CatchException')
     protected void populatePropertyFromJson(String json, String key) {
         JSONParser jsonParser = new JSONParser()
         DataConverter dataConverter = new JsonDataConverter()
@@ -79,7 +80,7 @@ class WorkflowTags {
      */
     List<String> constructTags() {
         DataConverter dataConverter = new JsonDataConverter()
-        Map<String, Object> allPropertiesWithValues = getProperties()
+        Map<String, Object> allPropertiesWithValues = properties
         Map<String, Object> propertiesWithValues = allPropertiesWithValues.findAll { it.value != null }
         List<String> propertyNames = propertiesWithValues.keySet().sort() - propertyNamesToIgnore
         propertyNames.collect { String propertyName ->
