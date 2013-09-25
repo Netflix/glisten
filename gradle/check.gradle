@@ -1,24 +1,22 @@
-// Checkstyle
-apply plugin: 'checkstyle'
-checkstyle {
-    ignoreFailures = true 
-    configFile = rootProject.file('codequality/checkstyle.xml')
+apply plugin: 'codenarc'
+dependencies {
+    codenarc 'org.codenarc:CodeNarc:0.19'
+}
+codenarcMain {
+    configFile = file('codequality/codenarcMain.groovy')
 }
 
-// FindBugs
-apply plugin: 'findbugs'
-findbugs {
-    ignoreFailures = true
+codenarcTest {
+    configFile = file('codequality/codenarcTest.groovy')
 }
-
-// PMD
-apply plugin: 'pmd'
-//tasks.withType(Pmd) { reports.html.enabled true }
+codenarc {
+	reportFormat = 'xml'
+}
 
 apply plugin: 'cobertura'
 cobertura {
     sourceDirs = sourceSets.main.java.srcDirs
-    format = 'html'
+    format = 'xml'
     includes = ['**/*.java', '**/*.groovy']
     excludes = []
 }
