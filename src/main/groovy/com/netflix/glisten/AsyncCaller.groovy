@@ -56,8 +56,8 @@ class AsyncCaller<T> {
             returnType = Void
         }
         List<Promise<?>> promises = args.collect { Promise.asPromise(it) }
-        DynamicActivitiesClient dynamicActivitiesClient = dynamicActivitiesClientFactory.getInstance()
-        return dynamicActivitiesClient.scheduleActivity(activityType, promises as Promise[], activitySchedulingOptions,
+        DynamicActivitiesClient dynamicActivitiesClient = dynamicActivitiesClientFactory.instance
+        dynamicActivitiesClient.scheduleActivity(activityType, promises as Promise[], activitySchedulingOptions,
                 returnType, null)
     }
 

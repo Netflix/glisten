@@ -17,12 +17,12 @@ package com.netflix.glisten
 
 import com.amazonaws.services.simpleworkflow.flow.DynamicActivitiesClient
 import com.amazonaws.services.simpleworkflow.model.ActivityType
-import com.netflix.glisten.AsyncCaller
 import com.netflix.glisten.example.trip.BayAreaTripActivities
 import spock.lang.Specification
 
 class AsyncCallerSpec extends Specification {
 
+    @SuppressWarnings('UnnecessaryCollectCall')
     def 'AsyncCaller should schedule activity for method call'() {
         def mockDynamicActivitiesClient = Mock(DynamicActivitiesClient)
         def mockDynamicActivitiesClientFactory = Mock(AsyncCaller.DynamicActivitiesClientFactory) {

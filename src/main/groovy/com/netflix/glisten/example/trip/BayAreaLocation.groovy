@@ -18,7 +18,7 @@ package com.netflix.glisten.example.trip
 /**
  * Used as part of the BayAreaTripWorkflow example of an SWF workflow.
  */
-public enum BayAreaLocation {
+enum BayAreaLocation {
     GoldenGateBridge('the Golden Gate Bridge'),
     Redwoods('Muir Woods'),
     Boardwalk('the Santa Cruz Boardwalk'),

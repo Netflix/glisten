@@ -42,7 +42,7 @@ class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
                         (BayAreaLocation.Monterey): this.&doAtMonterey,
                         (BayAreaLocation.Boardwalk): this.&doAtBoardwalk
                 ]
-                doAtLocation.getAt(destination).call()
+                doAtLocation[destination].call()
             }
         }
     }
@@ -53,13 +53,12 @@ class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
         }
         if (!previouslyVisited.contains(BayAreaLocation.Redwoods)) {
             return promiseFor(BayAreaLocation.Redwoods)
-        } else {
-            waitFor(activities.askYesNoQuestion('Do you like roller coasters?')) { boolean isThrillSeeker ->
-                if (isThrillSeeker) {
-                    return promiseFor(BayAreaLocation.Boardwalk)
-                }
-                promiseFor(BayAreaLocation.Monterey)
+        }
+        waitFor(activities.askYesNoQuestion('Do you like roller coasters?')) { boolean isThrillSeeker ->
+            if (isThrillSeeker) {
+                return promiseFor(BayAreaLocation.Boardwalk)
             }
+            promiseFor(BayAreaLocation.Monterey)
         }
     }
 
@@ -74,10 +73,10 @@ class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
             DoTry<String> hiking = doTry { promiseFor(activities.hike('through redwoods')) }
             DoTry<Void> countDown = cancellableTimer(30)
             // hike until done or out of time (which ever comes first)
-            waitFor(anyPromises(countDown.getResult(), hiking.getResult())) {
-                if (hiking.getResult().isReady()) {
+            waitFor(anyPromises(countDown.result, hiking.result)) {
+                if (hiking.result.isReady()) {
                     countDown.cancel(null)
-                    status "${hiking.getResult().get()}"
+                    status "${hiking.result.get()}"
                 } else {
                     hiking.cancel(null)
                     status 'And ran out of time when hiking.'
@@ -105,6 +104,7 @@ class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
         }
     }
 
+    @SuppressWarnings('UnnecessaryReturnKeyword')
     private Promise<Void> doAtBoardwalk() {
         int numberOfTokensGiven = 3
         int numberOfTokens = numberOfTokensGiven

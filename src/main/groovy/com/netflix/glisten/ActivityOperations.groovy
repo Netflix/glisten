@@ -20,7 +20,7 @@ import com.amazonaws.services.simpleworkflow.model.WorkflowExecution
 /**
  * Common behavior for an SWF activity. This enables implementations that are not tied to SWF.
  */
-public interface ActivityOperations {
+interface ActivityOperations {
 
     /**
      * Record a heartbeat during an activity. This lets a workflow know that the activity is still making progress.

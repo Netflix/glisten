@@ -47,6 +47,7 @@ import groovy.transform.Canonical
      * @param tags optional custom workflow tags
      * @return the workflow client
      */
+    @SuppressWarnings('UnnecessaryPublicModifier')
     public <T> InterfaceBasedWorkflowClient<T> getNewWorkflowClient(Class<T> workflow,
             WorkflowDescriptionTemplate workflowDescriptionTemplate, WorkflowTags tags = null) {
         WorkflowType workflowType = new WorkflowMetaAttributes(workflow).workflowType
@@ -73,13 +74,13 @@ import groovy.transform.Canonical
      * @param workflowIdentification ids for a specific existing workflow execution
      * @return the workflow client
      */
-    public WorkflowClientExternal getWorkflowClient(WorkflowExecution workflowIdentification) {
+    WorkflowClientExternal getWorkflowClient(WorkflowExecution workflowIdentification) {
         def factory = new WorkflowClientFactoryExternalBase<WorkflowClientExternal>(simpleWorkflow, domain) {
             @Override
             protected WorkflowClientExternal createClientInstance(WorkflowExecution workflowExecution,
                     StartWorkflowOptions options, DataConverter dataConverter,
                     GenericWorkflowClientExternal genericClient) {
-                new WorkflowClientExternalBase(workflowExecution, null, options, dataConverter, genericClient) {}
+                new WorkflowClientExternalBase(workflowExecution, null, options, dataConverter, genericClient) { }
             }
         }
         factory.getClient(workflowIdentification)

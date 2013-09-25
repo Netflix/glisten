@@ -24,6 +24,7 @@ import com.amazonaws.services.simpleworkflow.model.WorkflowExecution
  */
 class SwfActivityOperations implements ActivityOperations {
 
+    @SuppressWarnings('PrivateFieldCouldBeFinal')
     private ActivityExecutionContextProvider provider = new ActivityExecutionContextProviderImpl()
 
     @Override
