@@ -7,6 +7,9 @@ Glisten is an ease of use [Groovy](http://groovy.codehaus.org) library for build
 * [wiki](https://github.com/Netflix/glisten/wiki)
 * [slides](http://netflix.github.io/glisten) from [my talk at SpringOne 2013](http://www.springone2gx.com/conference/santa_clara/2013/09/session?id=29389)
 
+## Binaries
+[Maven Central Repository](http://search.maven.org/#search%7Cga%7C1%7Cglisten)
+
 ## Build
 
 ```
