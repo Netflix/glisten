@@ -63,7 +63,7 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
     }
 
     @Override
-    DoTry<T> withCatch(Closure<? extends Promise<T>> block) {
+    DoTry<T> withCatch(Closure block) {
         this.catchBlock = block
         this
     }

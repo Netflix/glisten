@@ -37,7 +37,7 @@ interface DoTry<T> {
      * @param block executed for exception should take a Throwable and return a Promise<T> for a stand in result
      * @return this object with catch logic implemented
      */
-    DoTry<T> withCatch(Closure<? extends Promise<T>> block)
+    DoTry<T> withCatch(Closure block)
 
     /**
      * Provide logic guaranteed to be performed once the work is done (even in the case of an exception).
