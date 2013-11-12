@@ -79,14 +79,19 @@ class WorkflowTags {
      * @return tags based on the properties of this class that can be used in an SWF workflow
      */
     List<String> constructTags() {
-        DataConverter dataConverter = new JsonDataConverter()
         Map<String, Object> allPropertiesWithValues = properties
         Map<String, Object> propertiesWithValues = allPropertiesWithValues.findAll { it.value != null }
         List<String> propertyNames = propertiesWithValues.keySet().sort() - propertyNamesToIgnore
-        propertyNames.collect { String propertyName ->
-            String data = dataConverter.toData(this."${propertyName}")
-            "{\"${propertyName}\":${data}}" as String
-        }
+        propertyNames.collect { constructTag(it) }
+    }
+
+    /**
+     * @return constructs a single tag value
+     */
+    String constructTag(String propertyName) {
+        DataConverter dataConverter = new JsonDataConverter()
+        String data = dataConverter.toData(this."${propertyName}")
+        "{\"${propertyName}\":${data}}"
     }
 
 }
