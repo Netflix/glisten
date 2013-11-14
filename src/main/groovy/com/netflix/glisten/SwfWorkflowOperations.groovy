@@ -89,15 +89,18 @@ class SwfWorkflowOperations<A> extends WorkflowOperations<A> {
     @Override
     <T> Promise<T> retry(RetryPolicy retryPolicy, Closure<? extends Promise<T>> work) {
         AsyncExecutor executor = new AsyncRetryingExecutor(retryPolicy, decisionContext.workflowClock)
-        Settable<T> result = new Settable<T>()
+        Settable<T> ultimateResult = new Settable<T>()
         executor.execute(new AsyncRunnable() {
             @Override
             void run() throws Throwable {
-                result.unchain()
-                result.chain(work())
+                if (ultimateResult.ready) {
+                    ultimateResult = new Settable()
+                }
+                ultimateResult.unchain()
+                ultimateResult.chain(work())
             }
         })
-        result
+        ultimateResult
     }
 
 }

@@ -31,7 +31,7 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
 
     private Closure catchBlock
     private finallyBlock
-    private final Settable result = new Settable()
+    private Settable result = new Settable()
 
     private SwfDoTry(Collection<Promise<?>> promises, Closure tryBlock, Closure catchBlock, Closure finallyBlock) {
         super(promises as Promise[])
@@ -92,17 +92,13 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
 
     @Override
     protected void doCatch(Throwable e) throws Throwable {
-        // It seems unlikely that the result would be ready and we would be in this catch block, but I have seen it
-        // happen when a doTry wraps a retry and uses its result. You can't unchain if the result is ready. So to play
-        // it safe, we worry about overriding the result with the catch block result in this case.
-        boolean isChainable = !result.isReady()
-        if (isChainable) {
-            result.unchain()
+        // You can't unchain if the result is ready. It seems unlikely that the result would be ready and we would be
+        // in this catch block, but I have seen it happen when a doTry wraps a retry and uses its result.
+        if (result.isReady()) {
+            result = new Settable()
         }
-        def blockResult = catchBlock(e)
-        if (isChainable) {
-            result.chain(wrapWithPromise(blockResult))
-        }
+        result.unchain()
+        result.chain(wrapWithPromise(catchBlock(e)))
     }
 
     @Override
