@@ -30,7 +30,7 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
     private final Closure tryBlock
 
     private Closure catchBlock
-    private finallyBlock
+    private Closure finallyBlock
     private Settable result = new Settable()
 
     private SwfDoTry(Collection<Promise<?>> promises, Closure tryBlock, Closure catchBlock, Closure finallyBlock) {
@@ -103,11 +103,15 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
 
     @Override
     protected void doFinally() throws Throwable {
-        new Functor([result] as Promise[]) {
-            @Override
-            protected Promise doExecute() {
-                finallyBlock(result.get())
+        if (result?.ready) {
+            new Functor([result] as Promise[]) {
+                @Override
+                protected Promise doExecute() {
+                    finallyBlock(result.get())
+                }
             }
+        } else {
+            finallyBlock(null)
         }
     }
 }

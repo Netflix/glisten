@@ -52,7 +52,11 @@ class LocalDoTry implements DoTry {
 
     @Override
     DoTry withFinally(Closure doFinallyBlock) {
-        doFinallyBlock(result?.get())
+        if (result?.ready) {
+            doFinallyBlock(result?.get())
+        } else {
+            doFinallyBlock(null)
+        }
         if (error) {
             throw error
         }
