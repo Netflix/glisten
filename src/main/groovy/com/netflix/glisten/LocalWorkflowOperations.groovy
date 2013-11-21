@@ -29,9 +29,10 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
 
     final A activities
 
-    private int timerCallCounter = 0
+    /** Zero based counter for the number of timers that have been encountered by the workflow */
+    int timerCallCounter = 0
 
-    /** sequence used in the order that timers are started in your workflow (true indicates a fired timer) */
+    /** Sequence is used in the order that timers are started in your workflow (true indicates a fired timer) */
     List<Boolean> timerHasFiredSequence = []
 
     static <T> LocalWorkflowOperations<T> of(T activities) {
@@ -62,13 +63,15 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
     @Override
     Promise<Void> timer(long delaySeconds) {
         boolean timerHasFired = delaySeconds == 0
+        // check the sequence for firing information
         if (timerHasFiredSequence.size() > timerCallCounter) {
-            timerHasFired = timerHasFiredSequence[timerCallCounter++]
+            timerHasFired = timerHasFiredSequence[timerCallCounter]
+            timerCallCounter++
         }
         if (timerHasFired) {
             return Promise.Void()
         }
-        new Settable()
+        new Settable() // return a Promise that is not ready
     }
 
     @Override
