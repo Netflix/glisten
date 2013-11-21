@@ -69,7 +69,7 @@ class WorkflowTags {
                     value = dataConverter.fromData(valueString, type)
                 }
                 this."${key}" = value
-            } catch (DataConverterException ignore) {
+            } catch (Exception ignore) {
                 // Could not convert data so the property will not be populated
             }
         }
