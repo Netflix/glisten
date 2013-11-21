@@ -30,7 +30,7 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
 
     private Closure catchBlock
     private Closure finallyBlock
-    private PromisingResult promisingResult = new PromisingResult()
+    private final PromisingResult promisingResult = new PromisingResult()
 
     private SwfDoTry(Collection<Promise<?>> promises, Closure tryBlock, Closure catchBlock, Closure finallyBlock) {
         super(promises as Promise[])

@@ -98,6 +98,7 @@ abstract class WorkflowOperations<A> {
      * @param value that may need to be wrapped with a promise
      * @return guaranteed to be wrapped by one and only one promise
      */
+    @SuppressWarnings('UnnecessaryPublicModifier')
     public <T> Promise<T> promiseFor(T object) {
         PromisingResult.wrapWithPromise(object)
     }

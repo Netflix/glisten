@@ -16,7 +16,6 @@
 package com.netflix.glisten
 
 import com.amazonaws.services.simpleworkflow.flow.DataConverter
-import com.amazonaws.services.simpleworkflow.flow.DataConverterException
 import com.amazonaws.services.simpleworkflow.flow.JsonDataConverter
 import groovy.transform.Canonical
 import org.json.simple.parser.JSONParser
