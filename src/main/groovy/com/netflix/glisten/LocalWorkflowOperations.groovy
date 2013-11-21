@@ -39,13 +39,6 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
     }
 
     @Override
-    <T> Promise<T> promiseFor(T object) {
-        if (object == null) { return new Settable() }
-        boolean isPromise = Promise.isAssignableFrom(object.getClass())
-        isPromise ? (Promise) object : Promise.asPromise(object)
-    }
-
-    @Override
     <T> Promise<T> waitFor(Promise<?> promise, Closure<? extends Promise<T>> work) {
         if (promise.isReady()) {
             return work(promise.get())

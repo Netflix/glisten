@@ -21,7 +21,6 @@ import com.amazonaws.services.simpleworkflow.flow.DecisionContextProvider
 import com.amazonaws.services.simpleworkflow.flow.DecisionContextProviderImpl
 import com.amazonaws.services.simpleworkflow.flow.core.Functor
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
-import com.amazonaws.services.simpleworkflow.flow.core.Settable
 import com.amazonaws.services.simpleworkflow.flow.interceptors.AsyncExecutor
 import com.amazonaws.services.simpleworkflow.flow.interceptors.AsyncRetryingExecutor
 import com.amazonaws.services.simpleworkflow.flow.interceptors.AsyncRunnable
@@ -65,13 +64,6 @@ class SwfWorkflowOperations<A> extends WorkflowOperations<A> {
     }
 
     @Override
-    <T> Promise<T> promiseFor(T object) {
-        if (object == null) { return new Settable() }
-        boolean isPromise = Promise.isAssignableFrom(object.getClass())
-        isPromise ? (Promise) object : Promise.asPromise(object)
-    }
-
-    @Override
     <T> DoTry<T> doTry(Promise promise, Closure<? extends Promise<T>> work) {
         SwfDoTry.execute([promise], work)
     }
@@ -89,18 +81,14 @@ class SwfWorkflowOperations<A> extends WorkflowOperations<A> {
     @Override
     <T> Promise<T> retry(RetryPolicy retryPolicy, Closure<? extends Promise<T>> work) {
         AsyncExecutor executor = new AsyncRetryingExecutor(retryPolicy, decisionContext.workflowClock)
-        Settable<T> ultimateResult = new Settable<T>()
+        PromisingResult promisingResult = new PromisingResult()
         executor.execute(new AsyncRunnable() {
             @Override
             void run() throws Throwable {
-                if (ultimateResult.ready) {
-                    ultimateResult = new Settable()
-                }
-                ultimateResult.unchain()
-                ultimateResult.chain(work())
+                promisingResult.chain(work())
             }
         })
-        ultimateResult
+        promisingResult.result
     }
 
 }
