@@ -15,6 +15,7 @@
  */
 package com.netflix.glisten.example.trip
 
+import com.netflix.glisten.LocalWorkflowExecuter
 import com.netflix.glisten.LocalWorkflowOperations
 import spock.lang.Specification
 
@@ -23,10 +24,11 @@ class BayAreaTripWorkflowSpec extends Specification {
     BayAreaTripActivities mockActivities = Mock(BayAreaTripActivities)
     LocalWorkflowOperations workflowOperations = LocalWorkflowOperations.of(mockActivities)
     BayAreaTripWorkflow workflow = new BayAreaTripWorkflowImpl(workflowOperations: workflowOperations)
+    def workflowExecuter = LocalWorkflowExecuter.makeLocalWorkflowExecuter(workflow, workflowOperations)
 
     def 'should go to Golden Gate Bridge'() {
         when:
-        workflow.start('Clay', [])
+        workflowExecuter.start('Clay', [])
 
         then:
         workflow.logHistory == [
@@ -34,22 +36,27 @@ class BayAreaTripWorkflowSpec extends Specification {
                 'And hiked across the bridge.'
         ]
         0 * _
+        workflowOperations.firedTimerNames == []
+        workflowOperations.timerHistory == ['Timer useless NOT fired.']
+        workflowOperations.scopedTries.retries.size() == 0
+        workflowOperations.scopedTries.tries.size() == 3
         then: 1 * mockActivities.goTo('Clay', BayAreaLocation.GoldenGateBridge) >>
                 'Clay went to the Golden Gate Bridge.'
         then: 1 * mockActivities.hike('across the bridge') >> 'And hiked across the bridge.'
     }
 
     def 'should go to Redwoods and hike'() {
-        workflowOperations.timerHasFiredSequence = [true]
+        workflowOperations.addFiredTimerNames(['stretching'])
 
         when:
-        workflow.start('Clay', [BayAreaLocation.GoldenGateBridge])
+        workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge])
 
         then:
         workflow.logHistory == [
                 'Clay went to Muir Woods.',
                 'And stretched for 10 seconds before hiking.',
-                'And hiked through redwoods.'
+                'And hiked through redwoods.',
+                'Left forest safely (no bigfoot attack today).'
         ]
         0 * _
         then: 1 * mockActivities.goTo('Clay', BayAreaLocation.Redwoods) >> 'Clay went to Muir Woods.'
@@ -57,25 +64,67 @@ class BayAreaTripWorkflowSpec extends Specification {
     }
 
     def 'should go to Redwoods and hike until out of time'() {
-        workflowOperations.timerHasFiredSequence = [true, true]
+        workflowOperations.addFiredTimerNames(['stretching', 'countDown'])
+        mockActivities.hike('through redwoods') >> {
+            throw new NotDoneYetException('got to see what is around the next bend')
+        }
 
         when:
-        workflow.start('Clay', [BayAreaLocation.GoldenGateBridge])
+        workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge])
 
         then:
         workflow.logHistory == [
                 'Clay went to Muir Woods.',
                 'And stretched for 10 seconds before hiking.',
-                'And ran out of time when hiking.'
+                'And ran out of time when hiking.',
+                'Left forest safely (no bigfoot attack today).'
+        ]
+        then: 1 * mockActivities.goTo('Clay', BayAreaLocation.Redwoods) >> 'Clay went to Muir Woods.'
+    }
+
+    def 'should go to Redwoods and hike until getting around the first bend'() {
+        workflowOperations.addFiredTimerNames(['stretching'])
+
+        when:
+        workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge])
+
+        then:
+        workflow.logHistory == [
+                'Clay went to Muir Woods.',
+                'And stretched for 10 seconds before hiking.',
+                'And hiked through redwoods.',
+                'Left forest safely (no bigfoot attack today).'
         ]
         0 * _
         then: 1 * mockActivities.goTo('Clay', BayAreaLocation.Redwoods) >> 'Clay went to Muir Woods.'
-        then: 1 * mockActivities.hike('through redwoods') >> null
+        then: 1 * mockActivities.hike('through redwoods') >> {
+            throw new NotDoneYetException('got to see what is around the next bend')
+        }
+        then: 1 * mockActivities.hike('through redwoods') >> 'And hiked through redwoods.'
+    }
+
+    def 'should go to Redwoods and hike until something goes horribly wrong'() {
+        workflowOperations.addFiredTimerNames(['stretching'])
+
+        when:
+        workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge])
+
+        then:
+        workflow.logHistory == [
+                'Clay went to Muir Woods.',
+                'And stretched for 10 seconds before hiking.',
+                'Oh Noes! Something went horribly wrong!'
+        ]
+        0 * _
+        1 * mockActivities.goTo('Clay', BayAreaLocation.Redwoods) >> 'Clay went to Muir Woods.'
+        (1.._) * mockActivities.hike('through redwoods') >> {
+            throw new IllegalStateException('Something went horribly wrong!')
+        }
     }
 
     def 'should go to Boardwalk and win game'() {
         when:
-        workflow.start('Clay', BayAreaLocation.with { [GoldenGateBridge, Redwoods] })
+        workflowExecuter.start('Clay', BayAreaLocation.with { [GoldenGateBridge, Redwoods] })
 
         then:
         workflow.logHistory == [
@@ -92,7 +141,7 @@ class BayAreaTripWorkflowSpec extends Specification {
 
     def 'should go to boardwalk and lose game'() {
         when:
-        workflow.start('Clay', [BayAreaLocation.GoldenGateBridge, BayAreaLocation.Redwoods])
+        workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge, BayAreaLocation.Redwoods])
 
         then:
         workflow.logHistory == [
@@ -109,7 +158,7 @@ class BayAreaTripWorkflowSpec extends Specification {
 
     def 'should go to Monterey'() {
         when:
-        workflow.start('Clay', [BayAreaLocation.GoldenGateBridge, BayAreaLocation.Redwoods])
+        workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge, BayAreaLocation.Redwoods])
 
         then:
         workflow.logHistory == [
@@ -132,7 +181,7 @@ class BayAreaTripWorkflowSpec extends Specification {
 
     def 'should go to Monterey and get rained on'() {
         when:
-        workflow.start('Clay', [BayAreaLocation.GoldenGateBridge, BayAreaLocation.Redwoods])
+        workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge, BayAreaLocation.Redwoods])
 
         then:
         workflow.logHistory == [

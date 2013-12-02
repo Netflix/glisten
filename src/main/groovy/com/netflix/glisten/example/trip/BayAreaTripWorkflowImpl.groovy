@@ -16,6 +16,7 @@
 package com.netflix.glisten.example.trip
 
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
+import com.amazonaws.services.simpleworkflow.flow.core.Settable
 import com.amazonaws.services.simpleworkflow.flow.interceptors.ExponentialRetryPolicy
 import com.amazonaws.services.simpleworkflow.flow.interceptors.RetryPolicy
 import com.netflix.glisten.DoTry
@@ -42,7 +43,12 @@ class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
                         (BayAreaLocation.Monterey): this.&doAtMonterey,
                         (BayAreaLocation.Boardwalk): this.&doAtBoardwalk
                 ]
-                doAtLocation[destination].call()
+                doTry {
+                    doAtLocation[destination].call()
+                } withCatch { Throwable t ->
+                    status "Oh Noes! ${t.message}"
+                }
+                Promise.Void()
             }
         }
     }
@@ -63,17 +69,51 @@ class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
     }
 
     private Promise<Void> doAtBridge() {
-        waitFor(activities.hike('across the bridge')) { status it }
+        // These are all attempts to deadlock the workflow with different permutations of waitFor.
+        DoTry<Void> uselessTimer = cancellableTimer(42, 'useless')
+        waitFor(uselessTimer.result) { Promise.Void() }
+        waitFor(Promise.Void()) { Promise.Void() }
+        waitFor(new Settable()) { Promise.Void() }
+        waitFor(allPromises(uselessTimer.result)) { Promise.Void() }
+        waitFor(anyPromises(uselessTimer.result)) { Promise.Void() }
+        waitFor(allPromises(uselessTimer.result, Promise.Void())) { Promise.Void() }
+        waitFor(anyPromises(uselessTimer.result, new Settable())) { Promise.Void() }
+
+        // This ensures that we can call local private methods.
+        waitFor(Promise.Void()) {
+            doTry {
+                waitFor(Promise.Void()) {
+                    promiseForPrivateMethod
+                }
+            } withCatch { Throwable e ->
+                throw e
+            } result
+        }
+
+        // This is the actual work to accomplish what this method set out to do.
+        waitFor(activities.hike('across the bridge')) {
+            uselessTimer.cancel(null)
+            status it
+        }
+    }
+
+    private getPromiseForPrivateMethod() {
+        Promise.Void()
     }
 
     private Promise<Void> doAtRedwoods() {
         // take time to stretch before hiking
         status 'And stretched for 10 seconds before hiking.'
-        waitFor(timer(10)) {
-            DoTry<String> hiking = doTry { promiseFor(activities.hike('through redwoods')) }
-            DoTry<Void> countDown = cancellableTimer(30)
+        waitFor(timer(10, 'stretching')) {
+            DoTry<String> hiking = doTry {
+                retry(new ExponentialRetryPolicy(1).withExceptionsToRetry([NotDoneYetException])) {
+                    promiseFor(activities.hike('through redwoods'))
+                }
+            }
+            DoTry<Void> countDown = cancellableTimer(30, 'countDown')
+
             // hike until done or out of time (which ever comes first)
-            waitFor(anyPromises(countDown.result, hiking.result)) {
+            Promise<Boolean> doneHiking = waitFor(anyPromises(countDown.result, hiking.result)) {
                 if (hiking.result.isReady()) {
                     countDown.cancel(null)
                     status "${hiking.result.get()}"
@@ -81,6 +121,10 @@ class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
                     hiking.cancel(null)
                     status 'And ran out of time when hiking.'
                 }
+                Promise.asPromise(true)
+            }
+            waitFor(doneHiking) {
+                status 'Left forest safely (no bigfoot attack today).'
             }
         }
     }

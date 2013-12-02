@@ -64,17 +64,12 @@ class SwfWorkflowOperations<A> extends WorkflowOperations<A> {
     }
 
     @Override
-    <T> DoTry<T> doTry(Promise promise, Closure<? extends Promise<T>> work) {
-        SwfDoTry.execute([promise], work)
-    }
-
-    @Override
     <T> DoTry<T> doTry(Closure<? extends Promise<T>> work) {
-        doTry(Promise.Void(), work)
+        SwfDoTry.execute(work)
     }
 
     @Override
-    Promise<Void> timer(long delaySeconds) {
+    Promise<Void> timer(long delaySeconds, String name = '') {
         decisionContext.workflowClock.createTimer(delaySeconds)
     }
 
@@ -88,7 +83,7 @@ class SwfWorkflowOperations<A> extends WorkflowOperations<A> {
                 promisingResult.chain(work())
             }
         })
-        promisingResult.result
+        promisingResult
     }
 
 }

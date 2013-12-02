@@ -106,15 +106,6 @@ abstract class WorkflowOperations<A> {
     /**
      * Provides exception handling for the work.
      *
-     * @param promise that must be ready before work can be done
-     * @param work to do
-     * @return an object for specifying exception handling
-     */
-    abstract <T> DoTry<T> doTry(Promise promise, Closure<? extends Promise<T>> work)
-
-    /**
-     * Provides exception handling for the work.
-     *
      * @param work to do
      * @return an object for specifying exception handling
      */
@@ -129,14 +120,24 @@ abstract class WorkflowOperations<A> {
     abstract Promise<Void> timer(long delaySeconds)
 
     /**
+     * Start a timer for a specified number of seconds. No threads are made to sleep in the process.
+     *
+     * @param delaySeconds to wait
+     * @param name to identify timer
+     * @return a Promise that will be ready when the timer is done
+     */
+    abstract Promise<Void> timer(long delaySeconds, String name)
+
+    /**
      * Start a timer that can be cancelled. Useful for unnecessary timers that are keeping a workflow from ending.
      *
      * @param delaySeconds to wait
+     * @param name to identify timer
      * @return a DoTry whose result will be ready when the timer is done
      */
-    DoTry<Void> cancellableTimer(long delaySeconds) {
+    DoTry<Void> cancellableTimer(long delaySeconds, String name = '') {
         doTry {
-            timer(delaySeconds)
+            timer(delaySeconds, name)
         } withCatch { Throwable t ->
             if (t instanceof CancellationException) {
                 return Promise.Void()

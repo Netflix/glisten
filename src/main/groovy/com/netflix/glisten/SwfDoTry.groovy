@@ -75,7 +75,7 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
 
     @Override
     Promise<T> getResult() {
-        promisingResult.result
+        promisingResult
     }
 
     @Override

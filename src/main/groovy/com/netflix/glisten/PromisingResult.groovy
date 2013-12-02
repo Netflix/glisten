@@ -23,16 +23,44 @@ import com.amazonaws.services.simpleworkflow.flow.core.Settable
  *
  * @param < T > The type of object that is promised.
  */
-class PromisingResult<T> {
+class PromisingResult<T> extends Promise<T> {
 
-    private Settable<T> result = new Settable()
+    private Settable<T> result
 
-    /**
-     * @return the promise of a result
-     */
-    Promise<T> getResult() {
-        result
+    PromisingResult(String description = 'PromisingResult') {
+        result = new Settable()
+        result.description = description
     }
+
+    void setDescription(String description) {
+        result.description = description
+    }
+
+    @Override
+    T get() {
+        result.get()
+    }
+
+    @Override
+    boolean isReady() {
+        result.isReady()
+    }
+
+    @Override
+    protected void addCallback(Runnable callback) {
+        result.addCallback(callback)
+    }
+
+    @Override
+    protected void removeCallback(Runnable callback) {
+        result.removeCallback(callback)
+    }
+
+    @Override
+    String toString() {
+        result.toString()
+    }
+
 
     /**
      * Chain a value to this promised result.
@@ -49,6 +77,9 @@ class PromisingResult<T> {
      * @param promiseToChain will be chained to the result
      */
     void chain(Promise<T> promiseToChain) {
+        if (promiseToChain == this) {
+            return
+        }
         // This is the safest way to handle chaining that we are aware of. We still brute force a chain no matter what.
         // We are really just trying to avoid the potential for errors.
 
@@ -57,7 +88,10 @@ class PromisingResult<T> {
             // But this chain is happening anyway, so we are throwing out the result that was already ready.
             // This had been known to happen in some odd cases with retries and distributed try/catch blocks.
             // If you end up in a catch block or a subsequent retry, why was that original result ready?
+            Settable oldResult = result
             result = new Settable()
+            result.description = oldResult.description
+            oldResult.callbacks.each { result.addCallback(it) }
         }
 
         // There is no harm in unchaining whether or not anything was already chained so we always do it.
@@ -76,7 +110,7 @@ class PromisingResult<T> {
      */
     static <U> Promise<U> wrapWithPromise(U value) {
         if (value == null) { return new Settable() }
-        (Promise<U>) Promise.isAssignableFrom(value.getClass()) ? value : Promise.asPromise(value)
+        (Promise<U>) Promise.isAssignableFrom(value.getClass()) ? value : asPromise(value)
     }
 
 }

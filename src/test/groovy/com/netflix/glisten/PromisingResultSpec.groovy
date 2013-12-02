@@ -49,8 +49,8 @@ class PromisingResultSpec extends Specification {
         promiseString.chain(Promise.asPromise(quote))
 
         then:
-        promiseString.result.ready
-        promiseString.result.get() == quote
+        promiseString.ready
+        promiseString.get() == quote
     }
 
     def 'should chain to unready chained promise'() {
@@ -58,14 +58,14 @@ class PromisingResultSpec extends Specification {
         promiseString.chain(new Settable())
 
         then:
-        !promiseString.result.ready
+        !promiseString.ready
 
         when:
         promiseString.chain(Promise.asPromise(quote))
 
         then:
-        promiseString.result.ready
-        promiseString.result.get() == quote
+        promiseString.ready
+        promiseString.get() == quote
     }
 
     def 'should chain to ready chained promise'() {
@@ -73,15 +73,15 @@ class PromisingResultSpec extends Specification {
         promiseString.chain(Promise.asPromise(quote))
 
         then:
-        promiseString.result.ready
-        promiseString.result.get() == quote
+        promiseString.ready
+        promiseString.get() == quote
 
         when:
         promiseString.chain(Promise.asPromise(quote))
 
         then:
-        promiseString.result.ready
-        promiseString.result.get() == quote
+        promiseString.ready
+        promiseString.get() == quote
     }
 
 }
