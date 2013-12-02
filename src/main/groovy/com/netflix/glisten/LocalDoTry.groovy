@@ -43,6 +43,7 @@ class LocalDoTry implements DoTry {
                 result = doCatchBlock(error)
                 error = null
             } catch (Exception e) {
+                result = Promise.asPromise(null)
                 error = e
             }
         }
@@ -51,7 +52,11 @@ class LocalDoTry implements DoTry {
 
     @Override
     DoTry withFinally(Closure doFinallyBlock) {
-        doFinallyBlock(result?.get())
+        if (result?.ready) {
+            doFinallyBlock(result?.get())
+        } else {
+            doFinallyBlock(null)
+        }
         if (error) {
             throw error
         }
@@ -64,6 +69,9 @@ class LocalDoTry implements DoTry {
 
     @Override
     Promise getResult() {
+        if (error) {
+            throw error
+        }
         result
     }
 }

@@ -16,7 +16,6 @@
 package com.netflix.glisten
 
 import com.amazonaws.services.simpleworkflow.flow.DataConverter
-import com.amazonaws.services.simpleworkflow.flow.DataConverterException
 import com.amazonaws.services.simpleworkflow.flow.JsonDataConverter
 import groovy.transform.Canonical
 import org.json.simple.parser.JSONParser
@@ -69,7 +68,7 @@ class WorkflowTags {
                     value = dataConverter.fromData(valueString, type)
                 }
                 this."${key}" = value
-            } catch (DataConverterException ignore) {
+            } catch (Exception ignore) {
                 // Could not convert data so the property will not be populated
             }
         }
@@ -79,14 +78,19 @@ class WorkflowTags {
      * @return tags based on the properties of this class that can be used in an SWF workflow
      */
     List<String> constructTags() {
-        DataConverter dataConverter = new JsonDataConverter()
         Map<String, Object> allPropertiesWithValues = properties
         Map<String, Object> propertiesWithValues = allPropertiesWithValues.findAll { it.value != null }
         List<String> propertyNames = propertiesWithValues.keySet().sort() - propertyNamesToIgnore
-        propertyNames.collect { String propertyName ->
-            String data = dataConverter.toData(this."${propertyName}")
-            "{\"${propertyName}\":${data}}" as String
-        }
+        propertyNames.collect { constructTag(it) }
+    }
+
+    /**
+     * @return constructs a single tag value
+     */
+    String constructTag(String propertyName) {
+        DataConverter dataConverter = new JsonDataConverter()
+        String data = dataConverter.toData(this."${propertyName}")
+        "{\"${propertyName}\":${data}}"
     }
 
 }

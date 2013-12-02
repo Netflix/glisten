@@ -17,7 +17,6 @@ package com.netflix.glisten
 
 import com.amazonaws.services.simpleworkflow.flow.core.Functor
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
-import com.amazonaws.services.simpleworkflow.flow.core.Settable
 import com.amazonaws.services.simpleworkflow.flow.core.TryCatchFinally
 import com.google.common.collect.ImmutableSet
 
@@ -30,8 +29,8 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
     private final Closure tryBlock
 
     private Closure catchBlock
-    private finallyBlock
-    private final Settable result = new Settable()
+    private Closure finallyBlock
+    private final PromisingResult promisingResult = new PromisingResult()
 
     private SwfDoTry(Collection<Promise<?>> promises, Closure tryBlock, Closure catchBlock, Closure finallyBlock) {
         super(promises as Promise[])
@@ -63,7 +62,7 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
     }
 
     @Override
-    DoTry<T> withCatch(Closure<? extends Promise<T>> block) {
+    DoTry<T> withCatch(Closure block) {
         this.catchBlock = block
         this
     }
@@ -76,42 +75,30 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
 
     @Override
     Promise<T> getResult() {
-        result
-    }
-
-    private Promise<?> wrapWithPromise(def result) {
-        Promise.isAssignableFrom(result.getClass()) ? result : Promise.asPromise(result)
+        promisingResult.result
     }
 
     @Override
     protected void doTry() throws Throwable {
-        result.unchain()
-        def blockResult = tryBlock()
-        result.chain(wrapWithPromise(blockResult))
+        promisingResult.chain(tryBlock())
     }
 
     @Override
     protected void doCatch(Throwable e) throws Throwable {
-        // It seems unlikely that the result would be ready and we would be in this catch block, but I have seen it
-        // happen when a doTry wraps a retry and uses its result. You can't unchain if the result is ready. So to play
-        // it safe, we worry about overriding the result with the catch block result in this case.
-        boolean isChainable = !result.isReady()
-        if (isChainable) {
-            result.unchain()
-        }
-        def blockResult = catchBlock(e)
-        if (isChainable) {
-            result.chain(wrapWithPromise(blockResult))
-        }
+        promisingResult.chain(catchBlock(e))
     }
 
     @Override
     protected void doFinally() throws Throwable {
-        new Functor([result] as Promise[]) {
-            @Override
-            protected Promise doExecute() {
-                finallyBlock(result.get())
+        if (result?.ready) {
+            new Functor([result] as Promise[]) {
+                @Override
+                protected Promise doExecute() {
+                    finallyBlock(result.get())
+                }
             }
+        } else {
+            finallyBlock(null)
         }
     }
 }

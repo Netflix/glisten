@@ -21,8 +21,8 @@ import spock.lang.Specification
 class BayAreaTripWorkflowSpec extends Specification {
 
     BayAreaTripActivities mockActivities = Mock(BayAreaTripActivities)
-    BayAreaTripWorkflow workflow = new BayAreaTripWorkflowImpl(
-            workflowOperations: LocalWorkflowOperations.of(mockActivities))
+    LocalWorkflowOperations workflowOperations = LocalWorkflowOperations.of(mockActivities)
+    BayAreaTripWorkflow workflow = new BayAreaTripWorkflowImpl(workflowOperations: workflowOperations)
 
     def 'should go to Golden Gate Bridge'() {
         when:
@@ -40,6 +40,8 @@ class BayAreaTripWorkflowSpec extends Specification {
     }
 
     def 'should go to Redwoods and hike'() {
+        workflowOperations.timerHasFiredSequence = [true]
+
         when:
         workflow.start('Clay', [BayAreaLocation.GoldenGateBridge])
 
@@ -55,6 +57,8 @@ class BayAreaTripWorkflowSpec extends Specification {
     }
 
     def 'should go to Redwoods and hike until out of time'() {
+        workflowOperations.timerHasFiredSequence = [true, true]
+
         when:
         workflow.start('Clay', [BayAreaLocation.GoldenGateBridge])
 
