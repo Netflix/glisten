@@ -70,7 +70,11 @@ class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
         // take time to stretch before hiking
         status 'And stretched for 10 seconds before hiking.'
         waitFor(timer(10)) {
-            DoTry<String> hiking = doTry { promiseFor(activities.hike('through redwoods')) }
+            DoTry<String> hiking = doTry {
+                retry {
+                    promiseFor(activities.hike('through redwoods'))
+                }
+            }
             DoTry<Void> countDown = cancellableTimer(30)
             // hike until done or out of time (which ever comes first)
             waitFor(anyPromises(countDown.result, hiking.result)) {
