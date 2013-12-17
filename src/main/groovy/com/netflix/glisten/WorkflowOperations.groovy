@@ -135,7 +135,7 @@ abstract class WorkflowOperations<A> {
      * @param name to identify timer
      * @return a DoTry whose result will be ready when the timer is done
      */
-    DoTry<Void> cancellableTimer(long delaySeconds, String name = '') {
+    DoTry<Void> cancelableTimer(long delaySeconds, String name = '') {
         doTry {
             timer(delaySeconds, name)
         } withCatch { Throwable t ->

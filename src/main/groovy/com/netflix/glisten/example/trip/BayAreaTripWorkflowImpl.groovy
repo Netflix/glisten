@@ -70,7 +70,7 @@ class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
 
     private Promise<Void> doAtBridge() {
         // These are all attempts to deadlock the workflow with different permutations of waitFor.
-        DoTry<Void> uselessTimer = cancellableTimer(42, 'useless')
+        DoTry<Void> uselessTimer = cancelableTimer(42, 'useless')
         waitFor(uselessTimer.result) { Promise.Void() }
         waitFor(Promise.Void()) { Promise.Void() }
         waitFor(new Settable()) { Promise.Void() }
@@ -110,7 +110,7 @@ class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
                     promiseFor(activities.hike('through redwoods'))
                 }
             }
-            DoTry<Void> countDown = cancellableTimer(30, 'countDown')
+            DoTry<Void> countDown = cancelableTimer(30, 'countDown')
 
             // hike until done or out of time (which ever comes first)
             Promise<Boolean> doneHiking = waitFor(anyPromises(countDown.result, hiking.result)) {

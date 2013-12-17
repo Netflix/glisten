@@ -49,7 +49,7 @@ class LocalDoTrySpec extends Specification {
                     new Settable()
                 }
             }
-            cancellableTimer(10, 'test').result
+            cancelableTimer(10, 'test').result
         }
 
         then: 'Make sure all nested tries and retries exist and are not canceled'
@@ -69,10 +69,10 @@ class LocalDoTrySpec extends Specification {
         !doTryWithNesting.scopedTries.tries[0].canceled
         doTryWithNesting.scopedTries.retries.size() == 1
         !doTryWithNesting.scopedTries.retries[0].interrupted
-        LocalDoTry cancellableTimer = topLevelDoTry.scopedTries.tries[2]
-        !cancellableTimer.canceled
-        cancellableTimer.scopedTries.tries.size() == 0
-        cancellableTimer.scopedTries.retries.size() == 0
+        LocalDoTry cancelableTimer = topLevelDoTry.scopedTries.tries[2]
+        !cancelableTimer.canceled
+        cancelableTimer.scopedTries.tries.size() == 0
+        cancelableTimer.scopedTries.retries.size() == 0
 
         LocalRetry emptyRetry = topLevelDoTry.scopedTries.retries[0]
         !emptyRetry.interrupted
@@ -94,7 +94,7 @@ class LocalDoTrySpec extends Specification {
         doTryWithNesting.canceled
         doTryWithNesting.scopedTries.tries[0].canceled
         doTryWithNesting.scopedTries.retries[0].interrupted
-        cancellableTimer.canceled
+        cancelableTimer.canceled
         emptyRetry.interrupted
         retryWithNesting.interrupted
         retryWithNesting.scopedTries.tries[0].canceled
