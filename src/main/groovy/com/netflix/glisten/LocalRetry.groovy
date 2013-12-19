@@ -21,6 +21,7 @@ import com.amazonaws.services.simpleworkflow.flow.interceptors.RetryPolicy
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.ListeningExecutorService
 import java.util.concurrent.Callable
+import java.util.concurrent.CancellationException
 
 /**
  * Local implementation of retry logic sufficient to run unit tests without a real SWF dependency.
@@ -105,8 +106,11 @@ class LocalRetry<T> extends Promise<T> {
             })
             // Ensure that the result is updated when the future computation has completed.
             future.addListener({
-                def fResult = future.get()
-                result.chain(fResult)
+                try {
+                    result.chain(future.get())
+                } catch (CancellationException ignore) {
+                    // Canceling a try is intentional, it is not an error that needs to be handled.
+                }
             }, executor)
         }
         this
