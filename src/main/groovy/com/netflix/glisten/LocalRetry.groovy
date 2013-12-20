@@ -85,7 +85,7 @@ class LocalRetry<T> extends Promise<T> {
         if (retryPolicy.respondsTo('getMaximumAttempts')) {
             maximumAttempts = retryPolicy.maximumAttempts
         }
-        scopedTries.interceptMethodCallsInClosure(work)
+        work = scopedTries.interceptMethodCallsInClosure(work)
         try {
             result.chain(work())
             return result
