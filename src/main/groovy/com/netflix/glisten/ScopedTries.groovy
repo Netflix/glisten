@@ -75,7 +75,7 @@ class ScopedTries<A> extends WorkflowOperations<A> {
     }
 
     /**
-     * Modifies the closure so that it delates calls to this first. This allows us to build the scope hierarchy.
+     * Modifies the closure so that it delegates calls to this first. This allows us to build the scope hierarchy.
      *
      * @param closure containing partial workflow logic
      */
