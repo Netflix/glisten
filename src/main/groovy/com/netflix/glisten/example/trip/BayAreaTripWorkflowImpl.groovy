@@ -16,7 +16,6 @@
 package com.netflix.glisten.example.trip
 
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
-import com.amazonaws.services.simpleworkflow.flow.core.Settable
 import com.amazonaws.services.simpleworkflow.flow.interceptors.ExponentialRetryPolicy
 import com.amazonaws.services.simpleworkflow.flow.interceptors.RetryPolicy
 import com.netflix.glisten.DoTry
@@ -69,36 +68,9 @@ class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
     }
 
     private Promise<Void> doAtBridge() {
-        // These are all attempts to deadlock the workflow with different permutations of waitFor.
-        DoTry<Void> uselessTimer = cancelableTimer(42, 'useless')
-        waitFor(uselessTimer.result) { Promise.Void() }
-        waitFor(Promise.Void()) { Promise.Void() }
-        waitFor(new Settable()) { Promise.Void() }
-        waitFor(allPromises(uselessTimer.result)) { Promise.Void() }
-        waitFor(anyPromises(uselessTimer.result)) { Promise.Void() }
-        waitFor(allPromises(uselessTimer.result, Promise.Void())) { Promise.Void() }
-        waitFor(anyPromises(uselessTimer.result, new Settable())) { Promise.Void() }
-
-        // This ensures that we can call local private methods.
-        waitFor(Promise.Void()) {
-            doTry {
-                waitFor(Promise.Void()) {
-                    promiseForPrivateMethod
-                }
-            } withCatch { Throwable e ->
-                throw e
-            } result
-        }
-
-        // This is the actual work to accomplish what this method set out to do.
         waitFor(activities.hike('across the bridge')) {
-            uselessTimer.cancel(null)
             status it
         }
-    }
-
-    private getPromiseForPrivateMethod() {
-        Promise.Void()
     }
 
     private Promise<Void> doAtRedwoods() {

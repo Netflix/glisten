@@ -138,5 +138,4 @@ class LocalDoTrySpec extends Specification {
         then:
         topLevelDoTry.isDone()
     }
-
 }

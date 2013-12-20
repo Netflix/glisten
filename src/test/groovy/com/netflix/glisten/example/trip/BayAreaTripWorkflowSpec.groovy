@@ -36,10 +36,6 @@ class BayAreaTripWorkflowSpec extends Specification {
                 'And hiked across the bridge.'
         ]
         0 * _
-        workflowOperations.firedTimerNames == []
-        workflowOperations.timerHistory == ['Timer useless NOT fired.']
-        workflowOperations.scopedTries.retries.size() == 0
-        workflowOperations.scopedTries.tries.size() == 3
         then: 1 * mockActivities.goTo('Clay', BayAreaLocation.GoldenGateBridge) >>
                 'Clay went to the Golden Gate Bridge.'
         then: 1 * mockActivities.hike('across the bridge') >> 'And hiked across the bridge.'
