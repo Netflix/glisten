@@ -35,22 +35,20 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
 
     private final Set<String> firedTimerNames = []
     private final List<String> timerHistory = []
-    private final boolean shouldBlockUntilAllPromisesAreReady
     private final CountDownLatch waitForAllPromises = new CountDownLatch(1)
 
     private ScopedTries scopedTries
     private boolean isWorkflowExecutionComplete = false
 
-    static <T> LocalWorkflowOperations<T> of(T activities, boolean shouldBlockUntilAllPromisesAreReady = true) {
-        new LocalWorkflowOperations<T>(activities, shouldBlockUntilAllPromisesAreReady).with {
+    static <T> LocalWorkflowOperations<T> of(T activities) {
+        new LocalWorkflowOperations<T>(activities).with {
             scopedTries = new ScopedTries(it)
             it
         }
     }
 
-    private LocalWorkflowOperations(A activities, boolean shouldBlockUntilAllPromisesAreReady) {
+    private LocalWorkflowOperations(A activities) {
         this.activities = activities
-        this.shouldBlockUntilAllPromisesAreReady = shouldBlockUntilAllPromisesAreReady
     }
 
     /** The top of a hierarchy of tries and retries for this workflow execution. */
@@ -87,9 +85,7 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
     protected void workflowExecutionComplete() {
         isWorkflowExecutionComplete = true
         checkThatAllResultsAreAvailable()
-        if (shouldBlockUntilAllPromisesAreReady) {
-            waitForAllPromises.await()
-        }
+        waitForAllPromises.await()
     }
 
     @Override
