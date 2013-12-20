@@ -42,10 +42,10 @@ class EdgeCasesWorkflowSpec extends Specification {
 
         then:
         1 * mockActivities.doActivity('in waitFor') >> 'test'
-        workflowOperations.scopedTries.tries.size() == 3 // two of these should be nested inside the first one
+        workflowOperations.scopedTries.tries.size() == 1
         workflowOperations.scopedTries.retries.size() == 0
         LocalDoTry topLevelDoTry = workflowOperations.scopedTries.tries[0]
-        topLevelDoTry.scopedTries.tries.size() == 0
+        topLevelDoTry.scopedTries.tries.size() == 2
         topLevelDoTry.scopedTries.retries.size() == 0
     }
 

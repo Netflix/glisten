@@ -80,9 +80,7 @@ class ScopedTries<A> extends WorkflowOperations<A> {
      * @param closure containing partial workflow logic
      */
     Closure interceptMethodCallsInClosure(Closure closure) {
-        closure.delegate = this
-        closure.resolveStrategy = Closure.DELEGATE_FIRST
-        closure
+        closure.rehydrate(closure.delegate, this, this)
     }
 
     /**
