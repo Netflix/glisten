@@ -80,7 +80,7 @@ class ScopedTries<A> extends WorkflowOperations<A> {
      * @param closure containing partial workflow logic
      */
     Closure interceptMethodCallsInClosure(Closure closure) {
-        closure.rehydrate(closure.delegate, this, this)
+        closure.rehydrate(this, this, this)
     }
 
     /**
@@ -100,5 +100,28 @@ class ScopedTries<A> extends WorkflowOperations<A> {
 
     String toString() {
         "ScopedTries retries: ${localRetries} tries: ${localTries}"
+    }
+
+    /**
+     * This is done so that workflow methods do not ignore the hierarchy of tries and retries. Otherwise they would be
+     * at the root scope rather than their appropriate place in the hierarchy.
+     */
+    def methodMissing(String name, args) {
+        // The method must be on the workflow. We are here because it is not on WorkflowOperations.
+        // So grab the method on the workflow with the same name and pretend it is a closure.
+        Closure workflowMethodAsClosure = workflowOperations.workflow.&"${name}"
+
+        // Make a new instance of the workflow that sees this scoped tries as the workflowOperations.
+        Class<WorkflowOperator> workflowType = (Class<WorkflowOperator>) workflowMethodAsClosure.delegate.getClass()
+        WorkflowOperator localScopedWorkflowInstance = workflowType.newInstance()
+        localScopedWorkflowInstance.workflowOperations = this
+
+        // Create a new closure that delegates everything to the new workflow with properly scoped workflow operations.
+        // This is how you do it when you are serious about not delegating to anything else.
+        Closure rescopedWorkflowMethodAsClosure = workflowMethodAsClosure.rehydrate(localScopedWorkflowInstance,
+                localScopedWorkflowInstance, localScopedWorkflowInstance)
+
+        // Now that everything is configured, call the modified method with the original args.
+        rescopedWorkflowMethodAsClosure.call(*args)
     }
 }

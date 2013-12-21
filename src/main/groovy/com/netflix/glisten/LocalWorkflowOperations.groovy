@@ -38,6 +38,7 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
     private final CountDownLatch waitForAllPromises = new CountDownLatch(1)
 
     private ScopedTries scopedTries
+    private WorkflowOperator workflow
     private boolean isWorkflowExecutionComplete = false
 
     static <T> LocalWorkflowOperations<T> of(T activities) {
@@ -54,6 +55,10 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
     /** The top of a hierarchy of tries and retries for this workflow execution. */
     ScopedTries getScopedTries() {
         scopedTries
+    }
+
+    protected WorkflowOperator getWorkflow() {
+        workflow
     }
 
     /**
@@ -135,8 +140,17 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
     }
 
     public <T extends WorkflowOperator> T getExecuter(Class<T> workflowImplType) {
-        WorkflowOperator workflow = workflowImplType.newInstance()
+        (T) makeExecuter(workflowImplType, true)
+    }
+
+    public <T extends WorkflowOperator> T getNonblockingExecuter(Class<T> workflowImplType) {
+        (T) makeExecuter(workflowImplType, false)
+    }
+
+    private LocalWorkflowExecuter makeExecuter(Class<WorkflowOperator> workflowImplType,
+            boolean shouldBlockUntilAllPromisesAreReady) {
+        workflow = workflowImplType.newInstance()
         workflow.workflowOperations = this
-        LocalWorkflowExecuter.makeLocalWorkflowExecuter(workflow, this)
+        new LocalWorkflowExecuter(workflow, this, shouldBlockUntilAllPromisesAreReady)
     }
 }

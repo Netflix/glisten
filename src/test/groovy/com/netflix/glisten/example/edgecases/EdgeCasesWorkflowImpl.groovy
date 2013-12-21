@@ -61,7 +61,9 @@ class EdgeCasesWorkflowImpl implements EdgeCasesWorkflow, WorkflowOperator<EdgeC
         if (edgeCase == EdgeCase.WorkflowMethodCalls) {
             // This ensures that we can call local private methods.
             doTry {
-                doTry { Promise.Void() } result
+                doTry { Promise.Void() }
+                localMethodCall('local method call inside doTry')
+                nestingLocalMethodCalls('nested method call inside doTry')
             }
             waitFor(Promise.Void()) {
                 localMethodCall('local method call inside wait')
@@ -71,7 +73,6 @@ class EdgeCasesWorkflowImpl implements EdgeCasesWorkflow, WorkflowOperator<EdgeC
         }
 
     }
-
 
     private Promise<String> nestingLocalMethodCalls(String text) {
         localMethodCall(text)

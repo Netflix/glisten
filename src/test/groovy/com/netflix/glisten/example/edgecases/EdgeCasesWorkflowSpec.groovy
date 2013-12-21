@@ -55,10 +55,12 @@ class EdgeCasesWorkflowSpec extends Specification {
         1 * mockActivities.doActivity('local method call') >> 'check'
         1 * mockActivities.doActivity('nested local method call') >> 'this works too'
         1 * mockActivities.doActivity('local method call inside wait') >> 'yep'
+        1 * mockActivities.doActivity('local method call inside doTry') >> 'all good here'
+        1 * mockActivities.doActivity('nested method call inside doTry') >> 'even this worked'
         workflowOperations.scopedTries.tries.size() == 4
         workflowOperations.scopedTries.retries.size() == 0
         LocalDoTry containerDoTry = workflowOperations.scopedTries.tries[0]
-        containerDoTry.scopedTries.tries.size() == 1
+        containerDoTry.scopedTries.tries.size() == 3
         containerDoTry.scopedTries.retries.size() == 0
     }
 }

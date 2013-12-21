@@ -28,16 +28,7 @@ class LocalWorkflowExecuter implements WorkflowOperator {
     private final Object workflow
     private boolean shouldBlockUntilAllPromisesAreReady
 
-    static <T> T makeLocalWorkflowExecuter(T workflow, LocalWorkflowOperations workflowOperations) {
-        makeLocalWorkflowExecuter(workflow, workflowOperations, true)
-    }
-
-    static <T> T makeLocalWorkflowExecuter(T workflow, LocalWorkflowOperations workflowOperations,
-                                           boolean shouldBlockUntilAllPromisesAreReady) {
-        new LocalWorkflowExecuter(workflow, workflowOperations, shouldBlockUntilAllPromisesAreReady)
-    }
-
-    private LocalWorkflowExecuter(Object workflow, LocalWorkflowOperations workflowOperations,
+    protected LocalWorkflowExecuter(Object workflow, LocalWorkflowOperations workflowOperations,
             boolean shouldBlockUntilAllPromisesAreReady) {
         this.workflow = workflow
         this.workflowOperations = workflowOperations
@@ -45,12 +36,16 @@ class LocalWorkflowExecuter implements WorkflowOperator {
     }
 
     def methodMissing(String name, args) {
-        ReflectionHelper reflectionHelper = new ReflectionHelper(workflow.getClass())
-        Method method = reflectionHelper.findMethodForNameAndArgsOrFail(name, args as List)
-        method.invoke(workflow, args as Object[])
+        executeMethodByName(name, args as List)
         if (shouldBlockUntilAllPromisesAreReady) {
             workflowOperations.workflowExecutionComplete()
         }
+    }
+
+    private def executeMethodByName(String name, List args) {
+        ReflectionHelper reflectionHelper = new ReflectionHelper(workflow.getClass())
+        Method method = reflectionHelper.findMethodForNameAndArgsOrFail(name, args)
+        method.invoke(workflow, args as Object[])
     }
 
     @Override
