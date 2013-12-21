@@ -19,8 +19,9 @@ import com.amazonaws.services.simpleworkflow.flow.core.Settable
 import com.netflix.glisten.DoTry
 import com.netflix.glisten.SwfWorkflowOperations
 import com.netflix.glisten.WorkflowOperations
+import com.netflix.glisten.WorkflowOperator
 
-class EdgeCasesWorkflowImpl implements EdgeCasesWorkflow {
+class EdgeCasesWorkflowImpl implements EdgeCasesWorkflow, WorkflowOperator<EdgeCasesActivities> {
 
     @Delegate
     WorkflowOperations<EdgeCasesActivities> workflowOperations = SwfWorkflowOperations.of(EdgeCasesActivities)

@@ -16,14 +16,16 @@
 package com.netflix.glisten
 
 import java.lang.reflect.Method
+import javax.naming.OperationNotSupportedException
 
 /**
  * Wraps the execution of a workflow.
  */
-class LocalWorkflowExecuter {
+class LocalWorkflowExecuter implements WorkflowOperator {
+
+    final LocalWorkflowOperations workflowOperations
 
     private final Object workflow
-    private final LocalWorkflowOperations workflowOperations
     private boolean shouldBlockUntilAllPromisesAreReady
 
     static <T> T makeLocalWorkflowExecuter(T workflow, LocalWorkflowOperations workflowOperations) {
@@ -49,5 +51,10 @@ class LocalWorkflowExecuter {
         if (shouldBlockUntilAllPromisesAreReady) {
             workflowOperations.workflowExecutionComplete()
         }
+    }
+
+    @Override
+    void setWorkflowOperations(WorkflowOperations workflowOperations) {
+        throw new OperationNotSupportedException('The workflowOperations is not settable.')
     }
 }

@@ -133,4 +133,10 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
     def <T> Promise<T> retry(RetryPolicy retryPolicy, Closure<? extends Promise<T>> work) {
         scopedTries.retry(retryPolicy, work)
     }
+
+    public <T extends WorkflowOperator> T getExecuter(Class<T> workflowImplType) {
+        WorkflowOperator workflow = workflowImplType.newInstance()
+        workflow.workflowOperations = this
+        LocalWorkflowExecuter.makeLocalWorkflowExecuter(workflow, this)
+    }
 }

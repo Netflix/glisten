@@ -21,11 +21,12 @@ import com.amazonaws.services.simpleworkflow.flow.interceptors.RetryPolicy
 import com.netflix.glisten.DoTry
 import com.netflix.glisten.SwfWorkflowOperations
 import com.netflix.glisten.WorkflowOperations
+import com.netflix.glisten.WorkflowOperator
 
 /**
  * SWF workflow implementation for the BayAreaTripWorkflow example.
  */
-class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow {
+class BayAreaTripWorkflowImpl implements BayAreaTripWorkflow, WorkflowOperator<BayAreaTripActivities> {
 
     @Delegate
     WorkflowOperations<BayAreaTripActivities> workflowOperations = SwfWorkflowOperations.of(BayAreaTripActivities)

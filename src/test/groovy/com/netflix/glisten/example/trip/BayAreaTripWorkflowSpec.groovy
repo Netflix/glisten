@@ -15,7 +15,6 @@
  */
 package com.netflix.glisten.example.trip
 
-import com.netflix.glisten.LocalWorkflowExecuter
 import com.netflix.glisten.LocalWorkflowOperations
 import spock.lang.Specification
 
@@ -23,15 +22,14 @@ class BayAreaTripWorkflowSpec extends Specification {
 
     BayAreaTripActivities mockActivities = Mock(BayAreaTripActivities)
     LocalWorkflowOperations workflowOperations = LocalWorkflowOperations.of(mockActivities)
-    BayAreaTripWorkflow workflow = new BayAreaTripWorkflowImpl(workflowOperations: workflowOperations)
-    def workflowExecuter = LocalWorkflowExecuter.makeLocalWorkflowExecuter(workflow, workflowOperations)
+    def workflowExecuter = workflowOperations.getExecuter(BayAreaTripWorkflowImpl)
 
     def 'should go to Golden Gate Bridge'() {
         when:
         workflowExecuter.start('Clay', [])
 
         then:
-        workflow.logHistory == [
+        workflowOperations.logHistory == [
                 'Clay went to the Golden Gate Bridge.',
                 'And hiked across the bridge.'
         ]
@@ -48,7 +46,7 @@ class BayAreaTripWorkflowSpec extends Specification {
         workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge])
 
         then:
-        workflow.logHistory == [
+        workflowOperations.logHistory == [
                 'Clay went to Muir Woods.',
                 'And stretched for 10 seconds before hiking.',
                 'And hiked through redwoods.',
@@ -69,7 +67,7 @@ class BayAreaTripWorkflowSpec extends Specification {
         workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge])
 
         then:
-        workflow.logHistory == [
+        workflowOperations.logHistory == [
                 'Clay went to Muir Woods.',
                 'And stretched for 10 seconds before hiking.',
                 'And ran out of time when hiking.',
@@ -85,7 +83,7 @@ class BayAreaTripWorkflowSpec extends Specification {
         workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge])
 
         then:
-        workflow.logHistory == [
+        workflowOperations.logHistory == [
                 'Clay went to Muir Woods.',
                 'And stretched for 10 seconds before hiking.',
                 'And hiked through redwoods.',
@@ -106,7 +104,7 @@ class BayAreaTripWorkflowSpec extends Specification {
         workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge])
 
         then:
-        workflow.logHistory == [
+        workflowOperations.logHistory == [
                 'Clay went to Muir Woods.',
                 'And stretched for 10 seconds before hiking.',
                 'Oh Noes! Something went horribly wrong!'
@@ -123,7 +121,7 @@ class BayAreaTripWorkflowSpec extends Specification {
         workflowExecuter.start('Clay', BayAreaLocation.with { [GoldenGateBridge, Redwoods] })
 
         then:
-        workflow.logHistory == [
+        workflowOperations.logHistory == [
                 'Clay went to the Santa Cruz Boardwalk.',
                 'And won a carnival game.',
                 'And enjoyed a roller coaster'
@@ -140,7 +138,7 @@ class BayAreaTripWorkflowSpec extends Specification {
         workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge, BayAreaLocation.Redwoods])
 
         then:
-        workflow.logHistory == [
+        workflowOperations.logHistory == [
                 'Clay went to the Santa Cruz Boardwalk.',
                 'And lost a carnival game. 3 times.'
         ]
@@ -157,7 +155,7 @@ class BayAreaTripWorkflowSpec extends Specification {
         workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge, BayAreaLocation.Redwoods])
 
         then:
-        workflow.logHistory == [
+        workflowOperations.logHistory == [
                 'Clay went to Monterey Bay.',
                 'And enjoyed eating seafood. And enjoyed watching sea lions.',
                 'And enjoyed looking for sea glass on the beach.',
@@ -180,7 +178,7 @@ class BayAreaTripWorkflowSpec extends Specification {
         workflowExecuter.start('Clay', [BayAreaLocation.GoldenGateBridge, BayAreaLocation.Redwoods])
 
         then:
-        workflow.logHistory == [
+        workflowOperations.logHistory == [
                 'Clay went to Monterey Bay.',
                 'And enjoyed eating seafood. And enjoyed watching sea lions.',
                 'And skipped the beach because it was raining!',

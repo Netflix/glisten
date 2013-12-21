@@ -16,7 +16,6 @@
 package com.netflix.glisten.example.edgecases
 
 import com.netflix.glisten.LocalDoTry
-import com.netflix.glisten.LocalWorkflowExecuter
 import com.netflix.glisten.LocalWorkflowOperations
 import spock.lang.Specification
 
@@ -24,8 +23,7 @@ class EdgeCasesWorkflowSpec extends Specification {
 
     EdgeCasesActivities mockActivities = Mock(EdgeCasesActivities)
     LocalWorkflowOperations workflowOperations = LocalWorkflowOperations.of(mockActivities)
-    EdgeCasesWorkflow workflow = new EdgeCasesWorkflowImpl(workflowOperations: workflowOperations)
-    def workflowExecuter = LocalWorkflowExecuter.makeLocalWorkflowExecuter(workflow, workflowOperations)
+    def workflowExecuter = workflowOperations.getExecuter(EdgeCasesWorkflowImpl)
 
     def 'should not deadlock'() {
         when:
