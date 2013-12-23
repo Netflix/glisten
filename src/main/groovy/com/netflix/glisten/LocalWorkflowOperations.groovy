@@ -15,88 +15,126 @@
  */
 package com.netflix.glisten
 
-import com.amazonaws.services.simpleworkflow.flow.common.FlowDefaults
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.core.Settable
 import com.amazonaws.services.simpleworkflow.flow.interceptors.RetryPolicy
-import groovy.transform.Canonical
+import com.google.common.collect.ImmutableList
+import com.google.common.util.concurrent.ListeningExecutorService
+import com.google.common.util.concurrent.MoreExecutors
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 
 /**
- * Local implementation sufficient to run unit tests without a real SWF dependency.
+ * Local implementation sufficient to run workflow unit tests without a real SWF dependency.
  */
-@Canonical
 class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
+
+    final ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(15))
 
     final A activities
 
-    /** Zero based counter for the number of timers that have been encountered by the workflow */
-    int timerCallCounter = 0
+    private final Set<String> firedTimerNames = []
+    private final List<String> timerHistory = []
+    private final boolean shouldBlockUntilAllPromisesAreReady
+    private final CountDownLatch waitForAllPromises = new CountDownLatch(1)
 
-    /** Sequence is used in the order that timers are started in your workflow (true indicates a fired timer) */
-    List<Boolean> timerHasFiredSequence = []
+    private ScopedTries scopedTries
+    private boolean isWorkflowExecutionComplete = false
 
-    static <T> LocalWorkflowOperations<T> of(T activities) {
-        new LocalWorkflowOperations<T>(activities)
+    static <T> LocalWorkflowOperations<T> of(T activities, boolean shouldBlockUntilAllPromisesAreReady = true) {
+        new LocalWorkflowOperations<T>(activities, shouldBlockUntilAllPromisesAreReady).with {
+            scopedTries = new ScopedTries(it)
+            it
+        }
+    }
+
+    private LocalWorkflowOperations(A activities, boolean shouldBlockUntilAllPromisesAreReady) {
+        this.activities = activities
+        this.shouldBlockUntilAllPromisesAreReady = shouldBlockUntilAllPromisesAreReady
+    }
+
+    /** The top of a hierarchy of tries and retries for this workflow execution. */
+    ScopedTries getScopedTries() {
+        scopedTries
+    }
+
+    /**
+     * Adds names of timers that should have fired during workflow execution.
+     *
+     * @param newFiredTimerNames to be added
+     */
+    void addFiredTimerNames(Collection<String> newFiredTimerNames) {
+        firedTimerNames.addAll(newFiredTimerNames)
+    }
+
+    /** Gets names of timers that should have fired during workflow execution. */
+    ImmutableList<String> getFiredTimerNames() {
+        ImmutableList.copyOf(firedTimerNames)
+    }
+
+    /** Gets a log of timers encountered during workflow execution and whether they fired. */
+    ImmutableList<String> getTimerHistory() {
+        ImmutableList.copyOf(timerHistory)
+    }
+
+    private void checkThatAllResultsAreAvailable() {
+        if (isWorkflowExecutionComplete && scopedTries.allDone()) {
+            waitForAllPromises.countDown()
+        }
+    }
+
+    /** Hooks into the end of a workflow execution. */
+    protected void workflowExecutionComplete() {
+        isWorkflowExecutionComplete = true
+        checkThatAllResultsAreAvailable()
+        if (shouldBlockUntilAllPromisesAreReady) {
+            waitForAllPromises.await()
+        }
     }
 
     @Override
-    <T> Promise<T> waitFor(Promise<?> promise, Closure<? extends Promise<T>> work) {
-        if (promise.isReady()) {
-            return work(promise.get())
-        }
-        new Settable()
-    }
-
-    @Override
-    <T> DoTry<T> doTry(Promise promise, Closure<? extends Promise<T>> work) {
-        if (promise.isReady()) {
-            return new LocalDoTry(work)
-        }
-        new LocalDoTry({ Promise.Void() })
-    }
-
-    @Override
-    <T> DoTry<T> doTry(Closure<? extends Promise<T>> work) {
-        new LocalDoTry(work)
-    }
-
-    @Override
-    Promise<Void> timer(long delaySeconds) {
-        boolean timerHasFired = delaySeconds == 0
-        // check the sequence for firing information
-        if (timerHasFiredSequence.size() > timerCallCounter) {
-            timerHasFired = timerHasFiredSequence[timerCallCounter]
-            timerCallCounter++
-        }
-        if (timerHasFired) {
-            return Promise.Void()
-        }
-        new Settable() // return a Promise that is not ready
-    }
-
-    @Override
-    <T> Promise<T> retry(RetryPolicy retryPolicy, Closure<? extends Promise<T>> work) {
-        int maximumAttempts = FlowDefaults.EXPONENTIAL_RETRY_MAXIMUM_ATTEMPTS
-        if (retryPolicy.respondsTo('getMaximumAttempts')) {
-            maximumAttempts = retryPolicy.maximumAttempts
-        }
-        recursingRetry(retryPolicy, work, maximumAttempts, 1)
-    }
-
     @SuppressWarnings('CatchThrowable')
-    private <T> Promise<T> recursingRetry(RetryPolicy retryPolicy, Closure<? extends Promise<T>> work,
-            int maximumAttempts, int attemptCount, Throwable t1 = null) {
-        if (maximumAttempts > 0 && attemptCount > maximumAttempts) {
-            throw t1
-        }
-        if (!t1 || retryPolicy.isRetryable(t1)) {
+    <T> Promise<T> waitFor(Promise<?> promise, Closure<? extends Promise<T>> work) {
+        Settable result = new Settable()
+        result.description = "waitFor ${promise}"
+        promise.addCallback {
             try {
-                return work()
-            } catch (Throwable t2) {
-                recursingRetry(retryPolicy, work, maximumAttempts, attemptCount + 1, t2)
+                // Execute work once the promise is ready.
+                result.chain(work(promise.get()))
+            } catch (Throwable t) {
+                // Don't block on workflow completion if there was an error. Just stop.
+                waitForAllPromises.countDown()
+                throw t
+            } finally {
+                // Recheck completion of all nested processes.
+                checkThatAllResultsAreAvailable()
             }
-        } else {
-            throw t1
         }
+        result
+    }
+
+    @Override
+    Promise<Void> timer(long delaySeconds, String name = '') {
+        boolean hasTimerFired = hasTimerFired(delaySeconds, name)
+        timerHistory << "Timer ${name} ${hasTimerFired ? '' : 'NOT'} fired."
+        Settable timerResult = new Settable()
+        timerResult.description = "timer: ${name}"
+        timerResult.ready = hasTimerFired
+        timerResult
+    }
+
+    private boolean hasTimerFired(long delaySeconds, String name = '') {
+        if (firedTimerNames.contains(name)) { return true }
+        delaySeconds == 0
+    }
+
+    @Override
+    def <T> DoTry<T> doTry(Closure<? extends Promise<T>> work) {
+        scopedTries.doTry(work)
+    }
+
+    @Override
+    def <T> Promise<T> retry(RetryPolicy retryPolicy, Closure<? extends Promise<T>> work) {
+        scopedTries.retry(retryPolicy, work)
     }
 }

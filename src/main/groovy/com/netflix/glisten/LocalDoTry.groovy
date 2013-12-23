@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.netflix.glisten
 
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
-import com.amazonaws.services.simpleworkflow.flow.core.Settable
 
 /**
  * Local implementation sufficient to run unit tests without a real SWF dependency.
@@ -24,26 +24,41 @@ import com.amazonaws.services.simpleworkflow.flow.core.Settable
 @SuppressWarnings('CatchException')
 class LocalDoTry implements DoTry {
 
+    private final ScopedTries scopedTries
+    private final PromisingResult result = new PromisingResult('LocalDoTry')
+
+    private boolean canceled = false
     private Exception error
 
-    private Promise result = new Settable()
+    LocalDoTry(LocalWorkflowOperations workflowOperations) {
+        scopedTries = new ScopedTries(workflowOperations)
+    }
 
-    LocalDoTry(Closure<? extends Promise> tryBlock) {
+    /**
+     * Tries to execute the closure passed in.
+     *
+     * @param tryBlock to execute
+     */
+    LocalDoTry tryIt(Closure<? extends Promise> tryBlock) {
+        scopedTries.interceptMethodCallsInClosure(tryBlock)
         try {
-            result = tryBlock()
+            result.chain(tryBlock())
         } catch (Exception e) {
+            result.description = "Error in LocalDoTry try: ${e}"
             error = e
         }
+        this
     }
 
     @Override
     DoTry withCatch(Closure doCatchBlock) {
         if (error) {
             try {
-                result = doCatchBlock(error)
+                result.chain(doCatchBlock(error))
                 error = null
             } catch (Exception e) {
-                result = Promise.asPromise(null)
+                result.description = "Error in LocalDoTry catch: ${e}"
+                result.chain(Promise.asPromise(null))
                 error = e
             }
         }
@@ -63,15 +78,39 @@ class LocalDoTry implements DoTry {
         this
     }
 
+    /** Cancels this try logic and everything nested inside it. */
     @Override
     void cancel(Throwable cause) {
+        canceled = true
+        result.description = 'Canceled LocalDoTry'
+        scopedTries.cancel()
     }
 
+    /**
+     * Indicates if this try is done. Done means that all nested operations are done and it is complete due to being
+     * ready, canceled or failed.
+     */
+    boolean isDone() {
+        if (!scopedTries.allDone()) { return false }
+        if (canceled || error) { return true }
+        result.ready
+    }
+
+    /** Gets a promise for the result of the try logic. */
     @Override
     Promise getResult() {
         if (error) {
             throw error
         }
+        scopedTries.retries.each {
+            if (it.unretriableError) {
+                throw it.unretriableError
+            }
+        }
         result
+    }
+
+    String toString() {
+        "LocalDoTry [canceled=${canceled}, result=${result}, isDone=${isDone()}]"
     }
 }

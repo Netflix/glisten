@@ -19,11 +19,20 @@ import com.amazonaws.services.simpleworkflow.flow.core.Functor
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.core.TryCatchFinally
 import com.google.common.collect.ImmutableSet
+import java.util.concurrent.CancellationException
 
 /**
  * SWF specific implementation.
  */
 class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
+
+    /** Canceling a try is intentional, it is not an error that needs to be handled. */
+    private static final Closure SWALLOW_CANCELLATION_EXCEPTION = { Closure handleError, Throwable e ->
+        if (e instanceof CancellationException) { return }
+        handleError(e)
+    }
+    private static final Closure SWALLOW_CANCELLATION_EXCEPTION_THROW_EVERYTHING_ELSE = SWALLOW_CANCELLATION_EXCEPTION.
+            curry { Throwable e -> throw e }
 
     private final ImmutableSet<Promise<?>> promises
     private final Closure tryBlock
@@ -48,7 +57,7 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
      * @return constructed DoTry
      */
     static DoTry<T> execute(Collection<Promise<?>> promises, Closure<? extends Promise<T>> tryBlock) {
-        new SwfDoTry(promises, tryBlock, { Throwable e -> throw e }, { })
+        new SwfDoTry(promises, tryBlock, SWALLOW_CANCELLATION_EXCEPTION_THROW_EVERYTHING_ELSE, { })
     }
 
     /**
@@ -63,7 +72,7 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
 
     @Override
     DoTry<T> withCatch(Closure block) {
-        this.catchBlock = block
+        this.catchBlock = SWALLOW_CANCELLATION_EXCEPTION.curry(block)
         this
     }
 
@@ -75,7 +84,7 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
 
     @Override
     Promise<T> getResult() {
-        promisingResult.result
+        promisingResult
     }
 
     @Override
@@ -90,11 +99,11 @@ class SwfDoTry<T> extends TryCatchFinally implements DoTry<T> {
 
     @Override
     protected void doFinally() throws Throwable {
-        if (result?.ready) {
-            new Functor([result] as Promise[]) {
+        if (promisingResult?.ready) {
+            new Functor([promisingResult] as Promise[]) {
                 @Override
                 protected Promise doExecute() {
-                    finallyBlock(result.get())
+                    finallyBlock(promisingResult.get())
                 }
             }
         } else {
