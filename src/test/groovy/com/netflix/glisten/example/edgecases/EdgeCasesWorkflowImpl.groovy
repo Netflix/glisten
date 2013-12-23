@@ -58,6 +58,18 @@ class EdgeCasesWorkflowImpl implements EdgeCasesWorkflow, WorkflowOperator<EdgeC
             } result
         }
 
+        if (edgeCase == EdgeCase.FailedTry) {
+            // This try should be done on failure
+            doTry {
+                retry { promiseFor(activities.doActivity('fails indefinitely')) }
+                doTry { promiseFor(activities.doActivity('will never be ready')) }
+                doTry { promiseFor(activities.doActivity('this should fail the whole try block')) } result
+            } withCatch { Throwable t ->
+                println t
+                Promise.Void()
+            } result
+        }
+
         if (edgeCase == EdgeCase.WorkflowMethodCalls) {
             // This ensures that we can call local private methods.
             doTry {

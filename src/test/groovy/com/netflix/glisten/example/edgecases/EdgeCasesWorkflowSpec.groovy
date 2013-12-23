@@ -47,6 +47,25 @@ class EdgeCasesWorkflowSpec extends Specification {
         topLevelDoTry.scopedTries.retries.size() == 0
     }
 
+    def 'should be done with try after a failure'() {
+        when:
+        workflowExecuter.start(EdgeCase.FailedTry)
+
+        then:
+        (1.._) * mockActivities.doActivity('fails indefinitely') >> {
+            throw new IllegalStateException('This will never work!')
+        }
+        1 * mockActivities.doActivity('this should fail the whole try block') >> {
+            throw new IllegalStateException('Stop it! You should all be ashamed of yourselves!')
+        }
+        workflowOperations.scopedTries.allDone()
+        LocalDoTry topLevelDoTry = workflowOperations.scopedTries.tries[0]
+        topLevelDoTry.isDone()
+        topLevelDoTry.scopedTries.retries[0].done
+        topLevelDoTry.scopedTries.tries[0].done
+        topLevelDoTry.scopedTries.tries[1].done
+    }
+
     def 'should call local workflow methods'() {
         when:
         workflowExecuter.start(EdgeCase.WorkflowMethodCalls)

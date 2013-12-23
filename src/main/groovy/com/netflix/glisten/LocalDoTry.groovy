@@ -44,6 +44,7 @@ class LocalDoTry implements DoTry {
         try {
             result.chain(tryBlock())
         } catch (Exception e) {
+            scopedTries.cancel()
             result.description = "Error in LocalDoTry try: ${e}"
             error = e
         }

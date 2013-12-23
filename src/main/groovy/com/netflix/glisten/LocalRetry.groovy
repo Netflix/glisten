@@ -129,6 +129,7 @@ class LocalRetry<T> extends Promise<T> {
         boolean abortRetry = lastError instanceof InterruptedException || unretriableError || tooManyAttempts
         if (abortRetry) {
             interrupted = true
+            scopedTries.cancel()
             result.description = "LocalRetry aborted: ${lastError}"
             throw lastError
         }
