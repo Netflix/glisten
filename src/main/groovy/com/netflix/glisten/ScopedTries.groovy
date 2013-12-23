@@ -65,6 +65,11 @@ class ScopedTries<A> extends WorkflowOperations<A> {
     }
 
     @Override
+    Promise<Void> status(String message) {
+        workflowOperations.status message
+    }
+
+    @Override
     Object getActivities() {
         workflowOperations.activities
     }

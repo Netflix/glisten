@@ -81,5 +81,17 @@ class EdgeCasesWorkflowSpec extends Specification {
         LocalDoTry containerDoTry = workflowOperations.scopedTries.tries[0]
         containerDoTry.scopedTries.tries.size() == 3
         containerDoTry.scopedTries.retries.size() == 0
+
+        workflowOperations.logHistory == [
+                'Starting workflow for WorkflowMethodCalls.',
+                'In top level doTry.',
+                'In localMethodCall: local method call inside doTry',
+                'In nestingLocalMethodCalls: nested method call inside doTry',
+                'In localMethodCall: nested method call inside doTry',
+                'In localMethodCall: local method call inside wait',
+                'In localMethodCall: local method call',
+                'In nestingLocalMethodCalls: nested local method call',
+                'In localMethodCall: nested local method call',
+        ]
     }
 }

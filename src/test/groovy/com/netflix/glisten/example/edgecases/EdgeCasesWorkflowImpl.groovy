@@ -29,6 +29,7 @@ class EdgeCasesWorkflowImpl implements EdgeCasesWorkflow, WorkflowOperator<EdgeC
     @Override
     @SuppressWarnings('AbcMetric')
     void start(EdgeCase edgeCase) {
+        status("Starting workflow for ${edgeCase}.")
 
         if (edgeCase == EdgeCase.WaitForDeadlocks) {
             // These are all attempts to deadlock the workflow with different permutations of waitFor.
@@ -73,6 +74,7 @@ class EdgeCasesWorkflowImpl implements EdgeCasesWorkflow, WorkflowOperator<EdgeC
         if (edgeCase == EdgeCase.WorkflowMethodCalls) {
             // This ensures that we can call local private methods.
             doTry {
+                status 'In top level doTry.'
                 doTry { Promise.Void() }
                 localMethodCall('local method call inside doTry')
                 nestingLocalMethodCalls('nested method call inside doTry')
@@ -87,10 +89,12 @@ class EdgeCasesWorkflowImpl implements EdgeCasesWorkflow, WorkflowOperator<EdgeC
     }
 
     private Promise<String> nestingLocalMethodCalls(String text) {
+        status "In nestingLocalMethodCalls: ${text}"
         localMethodCall(text)
     }
 
     private Promise<String> localMethodCall(String text) {
+        status "In localMethodCall: ${text}"
         doTry {
             promiseFor(activities.doActivity(text))
         } result
