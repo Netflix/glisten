@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.glisten
 
+package com.netflix.glisten
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.core.Settable
 
@@ -65,6 +65,9 @@ class LocalDoTry implements DoTry {
 
     @Override
     void cancel(Throwable cause) {
+        if (result instanceof FutureAsPromise) {
+            result.future.cancel(true)
+        }
     }
 
     @Override

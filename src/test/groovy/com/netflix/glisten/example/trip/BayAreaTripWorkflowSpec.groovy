@@ -58,6 +58,9 @@ class BayAreaTripWorkflowSpec extends Specification {
 
     def 'should go to Redwoods and hike until out of time'() {
         workflowOperations.timerHasFiredSequence = [true, true]
+        mockActivities.hike('through redwoods') >> {
+            throw new IllegalStateException('got to see what is around the next bend')
+        }
 
         when:
         workflow.start('Clay', [BayAreaLocation.GoldenGateBridge])
@@ -68,9 +71,7 @@ class BayAreaTripWorkflowSpec extends Specification {
                 'And stretched for 10 seconds before hiking.',
                 'And ran out of time when hiking.'
         ]
-        0 * _
         then: 1 * mockActivities.goTo('Clay', BayAreaLocation.Redwoods) >> 'Clay went to Muir Woods.'
-        then: 1 * mockActivities.hike('through redwoods') >> null
     }
 
     def 'should go to Boardwalk and win game'() {
