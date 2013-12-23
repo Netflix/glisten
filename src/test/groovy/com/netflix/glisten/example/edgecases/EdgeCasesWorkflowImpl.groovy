@@ -27,6 +27,7 @@ class EdgeCasesWorkflowImpl implements EdgeCasesWorkflow, WorkflowOperator<EdgeC
     WorkflowOperations<EdgeCasesActivities> workflowOperations = SwfWorkflowOperations.of(EdgeCasesActivities)
 
     @Override
+    @SuppressWarnings('AbcMetric')
     void start(EdgeCase edgeCase) {
 
         if (edgeCase == EdgeCase.WaitForDeadlocks) {
@@ -65,7 +66,6 @@ class EdgeCasesWorkflowImpl implements EdgeCasesWorkflow, WorkflowOperator<EdgeC
                 doTry { promiseFor(activities.doActivity('will never be ready')) }
                 doTry { promiseFor(activities.doActivity('this should fail the whole try block')) } result
             } withCatch { Throwable t ->
-                println t
                 Promise.Void()
             } result
         }

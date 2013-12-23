@@ -139,10 +139,12 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
         scopedTries.retry(retryPolicy, work)
     }
 
+    @SuppressWarnings('UnnecessaryPublicModifier')
     public <T extends WorkflowOperator> T getExecuter(Class<T> workflowImplType) {
         (T) makeExecuter(workflowImplType, true)
     }
 
+    @SuppressWarnings('UnnecessaryPublicModifier')
     public <T extends WorkflowOperator> T getNonblockingExecuter(Class<T> workflowImplType) {
         (T) makeExecuter(workflowImplType, false)
     }

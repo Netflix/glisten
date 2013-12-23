@@ -79,7 +79,8 @@ class ScopedTries<A> extends WorkflowOperations<A> {
      *
      * @param closure containing partial workflow logic
      */
-    Closure interceptMethodCallsInClosure(Closure closure) {
+    @SuppressWarnings('UnnecessaryPublicModifier')
+    public <T> Closure<T> interceptMethodCallsInClosure(Closure<T> closure) {
         closure.rehydrate(this, this, this)
     }
 

@@ -26,7 +26,7 @@ class LocalWorkflowExecuter implements WorkflowOperator {
     final LocalWorkflowOperations workflowOperations
 
     private final Object workflow
-    private boolean shouldBlockUntilAllPromisesAreReady
+    private final boolean shouldBlockUntilAllPromisesAreReady
 
     protected LocalWorkflowExecuter(Object workflow, LocalWorkflowOperations workflowOperations,
             boolean shouldBlockUntilAllPromisesAreReady) {
@@ -42,7 +42,7 @@ class LocalWorkflowExecuter implements WorkflowOperator {
         }
     }
 
-    private def executeMethodByName(String name, List args) {
+    private executeMethodByName(String name, List args) {
         ReflectionHelper reflectionHelper = new ReflectionHelper(workflow.getClass())
         Method method = reflectionHelper.findMethodForNameAndArgsOrFail(name, args)
         method.invoke(workflow, args as Object[])

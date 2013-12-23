@@ -40,9 +40,9 @@ class LocalDoTry implements DoTry {
      * @param tryBlock to execute
      */
     LocalDoTry tryIt(Closure<? extends Promise> tryBlock) {
-        tryBlock = scopedTries.interceptMethodCallsInClosure(tryBlock)
+        Closure<? extends Promise>  rescopedTryBlock = scopedTries.interceptMethodCallsInClosure(tryBlock)
         try {
-            result.chain(tryBlock())
+            result.chain(rescopedTryBlock())
         } catch (Exception e) {
             scopedTries.cancel()
             result.description = "Error in LocalDoTry try: ${e}"
