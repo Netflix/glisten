@@ -15,4 +15,4 @@
  */
 package com.netflix.glisten.example.edgecases
 
-enum EdgeCase { WaitForDeadlocks, WaitForScoping, WorkflowMethodCalls, FailedTry }
+enum EdgeCase { WaitForDeadlocks, WaitForScoping, WorkflowMethodCalls, FailedTry, Retry }

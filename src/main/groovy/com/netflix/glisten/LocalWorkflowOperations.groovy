@@ -32,6 +32,7 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
     final ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(15))
 
     final A activities
+    final Map<String, CountDownLatch> countDownLatchesByName = [:]
 
     private final Set<String> firedTimerNames = []
     private final List<String> timerHistory = []
@@ -80,7 +81,7 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
         ImmutableList.copyOf(timerHistory)
     }
 
-    private void checkThatAllResultsAreAvailable() {
+    void checkThatAllResultsAreAvailable() {
         if (isWorkflowExecutionComplete && scopedTries.allDone()) {
             waitForAllPromises.countDown()
         }
@@ -94,24 +95,8 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
     }
 
     @Override
-    @SuppressWarnings('CatchThrowable')
     <T> Promise<T> waitFor(Promise<?> promise, Closure<? extends Promise<T>> work) {
-        Settable result = new Settable()
-        result.description = "waitFor ${promise}"
-        promise.addCallback {
-            try {
-                // Execute work once the promise is ready.
-                result.chain(work(promise.get()))
-            } catch (Throwable t) {
-                // Don't block on workflow completion if there was an error. Just stop.
-                waitForAllPromises.countDown()
-                throw t
-            } finally {
-                // Recheck completion of all nested processes.
-                checkThatAllResultsAreAvailable()
-            }
-        }
-        result
+        scopedTries.waitFor(promise, work)
     }
 
     @Override

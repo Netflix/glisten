@@ -16,6 +16,8 @@
 package com.netflix.glisten.example.edgecases
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.core.Settable
+import com.amazonaws.services.simpleworkflow.flow.interceptors.ExponentialRetryPolicy
+import com.amazonaws.services.simpleworkflow.flow.interceptors.RetryPolicy
 import com.netflix.glisten.DoTry
 import com.netflix.glisten.SwfWorkflowOperations
 import com.netflix.glisten.WorkflowOperations
@@ -71,6 +73,25 @@ class EdgeCasesWorkflowImpl implements EdgeCasesWorkflow, WorkflowOperator<EdgeC
             } result
         }
 
+        if (edgeCase == EdgeCase.Retry) {
+            status 'Test started.'
+            RetryPolicy retryPolicy = new ExponentialRetryPolicy(1).withExceptionsToRetry([IllegalStateException])
+            Promise<String> resultPromise = doTry {
+                retry(retryPolicy) {
+                    waitFor(activities.doActivity('retry')) { String message ->
+                        if (message) {
+                            throw new IllegalStateException(message)
+                        }
+                        promiseFor(message)
+                    }
+                }
+            } result
+            waitFor(resultPromise) {
+                status 'Test completed.'
+            }
+            workflowOperations.countDownLatchesByName['long running activity'].countDown()
+        }
+
         if (edgeCase == EdgeCase.WorkflowMethodCalls) {
             // This ensures that we can call local private methods.
             doTry {
@@ -84,6 +105,7 @@ class EdgeCasesWorkflowImpl implements EdgeCasesWorkflow, WorkflowOperator<EdgeC
             }
             localMethodCall('local method call')
             nestingLocalMethodCalls('nested local method call')
+            doTry { Promise.Void() }
         }
 
     }

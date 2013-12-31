@@ -27,6 +27,7 @@ class ScopedTries<A> extends WorkflowOperations<A> {
 
     private final List<LocalRetry> localRetries = []
     private final List<LocalDoTry> localTries = []
+    private final List<LocalWaitFor> localWaitFors = []
     private final LocalWorkflowOperations workflowOperations
 
     ScopedTries(LocalWorkflowOperations workflowOperations) {
@@ -43,6 +44,11 @@ class ScopedTries<A> extends WorkflowOperations<A> {
         ImmutableList.copyOf(localTries)
     }
 
+    /** Gets waitFors at this level of the scoping hierarchy. */
+    ImmutableList<LocalWaitFor> getWaitFors() {
+        ImmutableList.copyOf(localWaitFors)
+    }
+
     @Override
     <T> DoTry<T> doTry(Closure<? extends Promise<T>> work) {
         LocalDoTry localDoTry = new LocalDoTry(workflowOperations)
@@ -52,11 +58,17 @@ class ScopedTries<A> extends WorkflowOperations<A> {
     }
 
     @Override
-    @SuppressWarnings('CatchThrowable')
     <T> Promise<T> retry(RetryPolicy retryPolicy, Closure<? extends Promise<T>> work) {
         LocalRetry localRetry = new LocalRetry(workflowOperations)
         localRetries << localRetry
         localRetry.retry(retryPolicy, work)
+    }
+
+    @Override
+    <T> Promise<T> waitFor(Promise<?> promise, Closure<? extends Promise<T>> work) {
+        LocalWaitFor localWaitFor = new LocalWaitFor(workflowOperations)
+        localWaitFors << localWaitFor
+        localWaitFor.waitForIt(promise, work)
     }
 
     @Override
@@ -72,11 +84,6 @@ class ScopedTries<A> extends WorkflowOperations<A> {
     @Override
     Object getActivities() {
         workflowOperations.activities
-    }
-
-    @Override
-    <T> Promise<T> waitFor(Promise<?> promise, Closure<? extends Promise<T>> work) {
-        workflowOperations.waitFor(promise, work)
     }
 
     /**
@@ -95,17 +102,18 @@ class ScopedTries<A> extends WorkflowOperations<A> {
     void cancel() {
         localRetries.each { it.cancel() }
         localTries.each { it.cancel(null) }
+        localWaitFors.each { it.cancel() }
     }
 
     /**
      * Indicates whether all the tries and retries are done.
      */
     boolean allDone() {
-        localRetries.every { it.isDone() } && localTries.every { it.isDone() }
+        localRetries.every { it.isDone() } && localTries.every { it.isDone() } && localWaitFors.every { it.isDone() }
     }
 
     String toString() {
-        "ScopedTries retries: ${localRetries} tries: ${localTries}"
+        "ScopedTries retries: ${localRetries} tries: ${localTries} waitFors: ${localWaitFors}"
     }
 
     /**

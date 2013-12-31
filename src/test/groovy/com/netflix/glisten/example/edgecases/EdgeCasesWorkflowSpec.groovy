@@ -17,6 +17,8 @@ package com.netflix.glisten.example.edgecases
 
 import com.netflix.glisten.LocalDoTry
 import com.netflix.glisten.LocalWorkflowOperations
+import com.netflix.glisten.ScopedTries
+import java.util.concurrent.CountDownLatch
 import spock.lang.Specification
 
 class EdgeCasesWorkflowSpec extends Specification {
@@ -43,8 +45,9 @@ class EdgeCasesWorkflowSpec extends Specification {
         workflowOperations.scopedTries.tries.size() == 1
         workflowOperations.scopedTries.retries.size() == 0
         LocalDoTry topLevelDoTry = workflowOperations.scopedTries.tries[0]
-        topLevelDoTry.scopedTries.tries.size() == 2
-        topLevelDoTry.scopedTries.retries.size() == 0
+        ScopedTries scopedTriesInWaitFor = topLevelDoTry.scopedTries.waitFors[0].scopedTries
+        scopedTriesInWaitFor.tries.size() == 2
+        scopedTriesInWaitFor.retries.size() == 0
     }
 
     def 'should be done with try after a failure'() {
@@ -78,9 +81,11 @@ class EdgeCasesWorkflowSpec extends Specification {
         1 * mockActivities.doActivity('nested method call inside doTry') >> 'even this worked'
         workflowOperations.scopedTries.tries.size() == 4
         workflowOperations.scopedTries.retries.size() == 0
+        workflowOperations.scopedTries.waitFors.size() == 1
         LocalDoTry containerDoTry = workflowOperations.scopedTries.tries[0]
         containerDoTry.scopedTries.tries.size() == 3
         containerDoTry.scopedTries.retries.size() == 0
+        containerDoTry.scopedTries.waitFors.size() == 0
 
         workflowOperations.logHistory == [
                 'Starting workflow for WorkflowMethodCalls.',
@@ -93,5 +98,27 @@ class EdgeCasesWorkflowSpec extends Specification {
                 'In nestingLocalMethodCalls: nested local method call',
                 'In localMethodCall: nested local method call',
         ]
+    }
+
+    def 'should retry and eventually pass without deadlock'() {
+        workflowOperations.countDownLatchesByName['long running activity'] = new CountDownLatch(1)
+
+        when:
+        workflowExecuter.start(EdgeCase.Retry)
+
+        then:
+        workflowOperations.logHistory == [
+                'Starting workflow for Retry.',
+                'Test started.',
+                'Test completed.',
+        ]
+        1 * mockActivities.doActivity('retry') >> {
+            'no luck this time'
+        }
+        1 * mockActivities.doActivity('retry') >> {
+            // The CountDownLatch makes the activity last longer than the workflow execution. We avoid a sleep call.
+            workflowOperations.countDownLatchesByName['long running activity'].await()
+            ''
+        }
     }
 }
