@@ -18,6 +18,9 @@ package com.netflix.glisten
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.core.Settable
 
+/**
+ * Local implementation sufficient to run unit tests without a real SWF dependency.
+ */
 class LocalWaitFor {
 
     private final ScopedTries scopedTries
@@ -30,6 +33,11 @@ class LocalWaitFor {
         scopedTries = new ScopedTries(workflowOperations)
     }
 
+    /**
+     * Executes the work once the promise is ready.
+     *
+     * @param tryBlock to execute
+     */
     @SuppressWarnings('CatchThrowable')
     <T> Promise<T> waitForIt(Promise<?> promise, Closure<? extends Promise<T>> work) {
         Settable result = new Settable()
@@ -51,11 +59,15 @@ class LocalWaitFor {
         result
     }
 
+    /** Cancels logic nested inside this waitFor. */
     void cancel() {
         isCanceled = true
         scopedTries.cancel()
     }
 
+    /**
+     * Indicates if the tries and retries nested in this waitFor are done.
+     */
     boolean isDone() {
         scopedTries.allDone()
     }

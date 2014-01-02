@@ -15,6 +15,11 @@
  */
 package com.netflix.glisten
 
+/**
+ * Specifies that a class has a WorkflowOperations.
+ *
+ * @param < A > The interface for the SWF activities used by this workflow.
+ */
 interface WorkflowOperator<A> {
 
     WorkflowOperations<A> getWorkflowOperations()

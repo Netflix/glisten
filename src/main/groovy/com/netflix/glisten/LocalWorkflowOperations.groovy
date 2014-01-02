@@ -32,6 +32,8 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
     final ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(15))
 
     final A activities
+
+    /** Named CountDownLatches can be put here to be shared between workflow and test to recreate race conditions.*/
     final Map<String, CountDownLatch> countDownLatchesByName = [:]
 
     private final Set<String> firedTimerNames = []
@@ -81,13 +83,14 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
         ImmutableList.copyOf(timerHistory)
     }
 
+    /** Checks the completion of this workflow and all nested work. Unblocks the workflow once complete. */
     void checkThatAllResultsAreAvailable() {
         if (isWorkflowExecutionComplete && scopedTries.allDone()) {
             waitForAllPromises.countDown()
         }
     }
 
-    /** Hooks into the end of a workflow execution. */
+    /** Hooks into the end of a workflow execution and allows it to block until done. */
     protected void workflowExecutionComplete() {
         isWorkflowExecutionComplete = true
         checkThatAllResultsAreAvailable()
@@ -124,11 +127,25 @@ class LocalWorkflowOperations<A> extends WorkflowOperations<A> {
         scopedTries.retry(retryPolicy, work)
     }
 
+    /**
+     * Creates an executer that runs the workflow. The workflow will wait for all try and retry results. This ensures
+     * that code works with the assumption that the workflow is done. Otherwise things like asserts in a unit test
+     * may have race conditions.
+     *
+     * @param workflowImplType the implementation class for the workflow
+     * @return an executer for the workflow seen as an instance of the workflow implementation itself
+     */
     @SuppressWarnings('UnnecessaryPublicModifier')
     public <T extends WorkflowOperator> T getExecuter(Class<T> workflowImplType) {
         (T) makeExecuter(workflowImplType, true)
     }
 
+    /**
+     * Creates an executer that runs the workflow. The workflow will not block for all try and retry results.
+     *
+     * @param workflowImplType the implementation class for the workflow
+     * @return an executer for the workflow seen as an instance of the workflow implementation itself
+     */
     @SuppressWarnings('UnnecessaryPublicModifier')
     public <T extends WorkflowOperator> T getNonblockingExecuter(Class<T> workflowImplType) {
         (T) makeExecuter(workflowImplType, false)

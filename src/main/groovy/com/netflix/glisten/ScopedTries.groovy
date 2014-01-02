@@ -90,6 +90,7 @@ class ScopedTries<A> extends WorkflowOperations<A> {
      * Modifies the closure so that it delegates calls to this first. This allows us to build the scope hierarchy.
      *
      * @param closure containing partial workflow logic
+     * @return closure with same logic but delegates to and is owned by this
      */
     @SuppressWarnings('UnnecessaryPublicModifier')
     public <T> Closure<T> interceptMethodCallsInClosure(Closure<T> closure) {
