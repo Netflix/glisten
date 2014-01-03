@@ -17,6 +17,7 @@ package com.netflix.glisten
 
 import com.amazonaws.services.simpleworkflow.flow.DynamicWorkflowClientExternal
 import com.amazonaws.services.simpleworkflow.flow.StartWorkflowOptions
+import com.netflix.glisten.impl.swf.WorkflowClientExternalToWorkflowInterfaceAdapter
 import groovy.transform.Canonical
 import spock.lang.Specification
 

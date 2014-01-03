@@ -18,6 +18,7 @@ package com.netflix.glisten
 import com.amazonaws.services.simpleworkflow.flow.ActivityExecutionContext
 import com.amazonaws.services.simpleworkflow.flow.ActivityExecutionContextProvider
 import com.amazonaws.services.simpleworkflow.model.WorkflowExecution
+import com.netflix.glisten.impl.swf.SwfActivityOperations
 import spock.lang.Specification
 
 class SwfActivitySpec extends Specification {

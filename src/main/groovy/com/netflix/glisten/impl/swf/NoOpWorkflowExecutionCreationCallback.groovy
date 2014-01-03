@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.glisten
+package com.netflix.glisten.impl.swf
 
 import com.amazonaws.services.simpleworkflow.model.WorkflowExecution
+import com.netflix.glisten.WorkflowExecutionCreationCallback
 
 /**
  * The default behavior after starting a workflow execution is to do nothing special. This default value allows

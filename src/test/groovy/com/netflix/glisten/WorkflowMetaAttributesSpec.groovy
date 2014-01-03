@@ -17,6 +17,7 @@ package com.netflix.glisten
 
 import com.amazonaws.services.simpleworkflow.model.WorkflowType
 import com.netflix.glisten.example.trip.BayAreaTripWorkflow
+import com.netflix.glisten.impl.WorkflowMetaAttributes
 import spock.lang.Specification
 
 class WorkflowMetaAttributesSpec extends Specification {

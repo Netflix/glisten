@@ -19,6 +19,7 @@ import com.amazonaws.services.simpleworkflow.flow.DynamicWorkflowClientExternal
 import com.amazonaws.services.simpleworkflow.flow.annotations.Execute
 import com.amazonaws.services.simpleworkflow.flow.annotations.GetState
 import com.amazonaws.services.simpleworkflow.flow.annotations.WorkflowRegistrationOptions
+import com.netflix.glisten.impl.swf.WorkflowClientExternalToWorkflowInterfaceAdapter
 import groovy.transform.Canonical
 import spock.lang.Specification
 

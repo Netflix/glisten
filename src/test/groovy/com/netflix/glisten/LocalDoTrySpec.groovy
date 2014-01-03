@@ -17,6 +17,9 @@ package com.netflix.glisten
 
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.core.Settable
+import com.netflix.glisten.impl.local.LocalDoTry
+import com.netflix.glisten.impl.local.LocalRetry
+import com.netflix.glisten.impl.local.LocalWorkflowOperations
 import spock.lang.Specification
 
 @SuppressWarnings('AbcMetric')

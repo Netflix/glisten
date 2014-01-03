@@ -19,7 +19,7 @@ import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.interceptors.ExponentialRetryPolicy
 import com.amazonaws.services.simpleworkflow.flow.interceptors.RetryPolicy
 import com.netflix.glisten.DoTry
-import com.netflix.glisten.SwfWorkflowOperations
+import com.netflix.glisten.impl.swf.SwfWorkflowOperations
 import com.netflix.glisten.WorkflowOperations
 import com.netflix.glisten.WorkflowOperator
 

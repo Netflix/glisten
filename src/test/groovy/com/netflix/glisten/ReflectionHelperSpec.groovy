@@ -19,6 +19,7 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.Execute
 import com.amazonaws.services.simpleworkflow.flow.annotations.GetState
 import com.amazonaws.services.simpleworkflow.flow.annotations.WorkflowRegistrationOptions
 import com.netflix.glisten.example.trip.BayAreaTripWorkflow
+import com.netflix.glisten.impl.ReflectionHelper
 import java.lang.reflect.Method
 import spock.lang.Specification
 

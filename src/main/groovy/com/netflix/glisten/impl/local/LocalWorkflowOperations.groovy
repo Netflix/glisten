@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.glisten
+package com.netflix.glisten.impl.local
 
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.core.Settable
@@ -21,6 +21,9 @@ import com.amazonaws.services.simpleworkflow.flow.interceptors.RetryPolicy
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.ListeningExecutorService
 import com.google.common.util.concurrent.MoreExecutors
+import com.netflix.glisten.DoTry
+import com.netflix.glisten.WorkflowOperations
+import com.netflix.glisten.WorkflowOperator
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 

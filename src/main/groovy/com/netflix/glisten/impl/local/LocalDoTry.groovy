@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package com.netflix.glisten
+package com.netflix.glisten.impl.local
 
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
+import com.netflix.glisten.DoTry
+import com.netflix.glisten.impl.PromisingResult
 
 /**
  * Local implementation sufficient to run unit tests without a real SWF dependency.

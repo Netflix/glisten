@@ -15,7 +15,7 @@
  */
 package com.netflix.glisten.example.trip
 
-import com.netflix.glisten.LocalWorkflowOperations
+import com.netflix.glisten.impl.local.LocalWorkflowOperations
 import spock.lang.Specification
 
 class BayAreaTripWorkflowSpec extends Specification {

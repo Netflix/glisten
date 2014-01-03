@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.glisten
+package com.netflix.glisten.impl.local
 
+import com.netflix.glisten.WorkflowOperations
+import com.netflix.glisten.WorkflowOperator
+import com.netflix.glisten.impl.ReflectionHelper
 import java.lang.reflect.Method
 import javax.naming.OperationNotSupportedException
 

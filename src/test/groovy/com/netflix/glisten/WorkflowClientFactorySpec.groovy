@@ -21,6 +21,7 @@ import com.amazonaws.services.simpleworkflow.flow.ManualActivityCompletionClient
 import com.amazonaws.services.simpleworkflow.flow.WorkflowClientExternal
 import com.amazonaws.services.simpleworkflow.model.WorkflowExecution
 import com.netflix.glisten.example.trip.BayAreaTripWorkflow
+import com.netflix.glisten.impl.swf.WorkflowClientExternalToWorkflowInterfaceAdapter
 import spock.lang.Specification
 
 class WorkflowClientFactorySpec extends Specification {

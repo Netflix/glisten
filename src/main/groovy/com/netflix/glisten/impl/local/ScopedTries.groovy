@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.glisten
+package com.netflix.glisten.impl.local
 
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.interceptors.RetryPolicy
 import com.google.common.collect.ImmutableList
+import com.netflix.glisten.DoTry
+import com.netflix.glisten.WorkflowOperations
+import com.netflix.glisten.WorkflowOperator
 
 /**
  * Used to build a hierarchy of tries and retries that are nested in other tries and retries. It is used to figure out

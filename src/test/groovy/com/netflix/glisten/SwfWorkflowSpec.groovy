@@ -21,6 +21,8 @@ import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.core.Settable
 import com.amazonaws.services.simpleworkflow.flow.worker.CurrentDecisionContext
 import com.netflix.glisten.example.trip.BayAreaTripActivities
+import com.netflix.glisten.impl.swf.AsyncCaller
+import com.netflix.glisten.impl.swf.SwfWorkflowOperations
 import spock.lang.Specification
 
 class SwfWorkflowSpec extends Specification {

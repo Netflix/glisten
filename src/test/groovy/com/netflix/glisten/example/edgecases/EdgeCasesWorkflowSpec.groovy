@@ -15,9 +15,9 @@
  */
 package com.netflix.glisten.example.edgecases
 
-import com.netflix.glisten.LocalDoTry
-import com.netflix.glisten.LocalWorkflowOperations
-import com.netflix.glisten.ScopedTries
+import com.netflix.glisten.impl.local.LocalDoTry
+import com.netflix.glisten.impl.local.LocalWorkflowOperations
+import com.netflix.glisten.impl.local.ScopedTries
 import java.util.concurrent.CountDownLatch
 import spock.lang.Specification
 

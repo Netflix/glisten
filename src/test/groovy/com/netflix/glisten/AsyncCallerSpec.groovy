@@ -18,6 +18,7 @@ package com.netflix.glisten
 import com.amazonaws.services.simpleworkflow.flow.DynamicActivitiesClient
 import com.amazonaws.services.simpleworkflow.model.ActivityType
 import com.netflix.glisten.example.trip.BayAreaTripActivities
+import com.netflix.glisten.impl.swf.AsyncCaller
 import spock.lang.Specification
 
 class AsyncCallerSpec extends Specification {
