@@ -104,20 +104,20 @@ class ScopedTries<A> extends WorkflowOperations<A> {
      * Cancels the tries and retries being done within this scope.
      */
     void cancel() {
-        localRetries.each { it.cancel() }
-        localTries.each { it.cancel(null) }
-        localWaitFors.each { it.cancel() }
+        retries.each { it.cancel() }
+        tries.each { it.cancel(null) }
+        waitFors.each { it.cancel() }
     }
 
     /**
      * Indicates whether all the tries and retries are done.
      */
     boolean allDone() {
-        localRetries.every { it.isDone() } && localTries.every { it.isDone() } && localWaitFors.every { it.isDone() }
+        retries.every { it.isDone() } && tries.every { it.isDone() } && waitFors.every { it.isDone() }
     }
 
     String toString() {
-        "ScopedTries retries: ${localRetries} tries: ${localTries} waitFors: ${localWaitFors}"
+        "ScopedTries retries: ${retries} tries: ${tries} waitFors: ${waitFors}"
     }
 
     /**
