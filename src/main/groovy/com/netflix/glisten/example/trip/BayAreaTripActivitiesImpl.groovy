@@ -18,7 +18,7 @@ package com.netflix.glisten.example.trip
 import com.amazonaws.services.simpleworkflow.flow.annotations.ManualActivityCompletion
 import com.amazonaws.services.simpleworkflow.model.WorkflowExecution
 import com.netflix.glisten.ActivityOperations
-import com.netflix.glisten.SwfActivityOperations
+import com.netflix.glisten.impl.swf.SwfActivityOperations
 import java.security.SecureRandom
 
 /**

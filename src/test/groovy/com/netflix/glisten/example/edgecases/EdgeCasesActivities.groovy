@@ -13,20 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.glisten
+package com.netflix.glisten.example.edgecases
 
-import com.amazonaws.services.simpleworkflow.model.WorkflowType
-import com.netflix.glisten.example.trip.BayAreaTripWorkflow
-import com.netflix.glisten.impl.WorkflowMetaAttributes
-import spock.lang.Specification
+interface EdgeCasesActivities {
 
-class WorkflowMetaAttributesSpec extends Specification {
-
-    def 'should get WorkflowType for class'() {
-        WorkflowMetaAttributes workflowMetaAttributes = new WorkflowMetaAttributes(BayAreaTripWorkflow)
-
-        expect:
-        workflowMetaAttributes.workflowType == new WorkflowType(name: 'BayAreaTripWorkflow.start', version: '1.0')
-    }
+    String doActivity(String text)
 
 }

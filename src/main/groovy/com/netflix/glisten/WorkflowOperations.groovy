@@ -20,6 +20,7 @@ import com.amazonaws.services.simpleworkflow.flow.core.OrPromise
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.interceptors.ExponentialRetryPolicy
 import com.amazonaws.services.simpleworkflow.flow.interceptors.RetryPolicy
+import com.netflix.glisten.impl.PromisingResult
 import java.util.concurrent.CancellationException
 
 /**

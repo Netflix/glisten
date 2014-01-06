@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.netflix.glisten
+package com.netflix.glisten.impl.local
 
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
+import com.netflix.glisten.DoTry
+import com.netflix.glisten.impl.PromisingResult
 
 /**
  * Local implementation sufficient to run unit tests without a real SWF dependency.
  */
-@SuppressWarnings('CatchException')
 class LocalDoTry implements DoTry {
 
     private final ScopedTries scopedTries
@@ -39,11 +40,13 @@ class LocalDoTry implements DoTry {
      *
      * @param tryBlock to execute
      */
+    @SuppressWarnings('CatchException')
     LocalDoTry tryIt(Closure<? extends Promise> tryBlock) {
-        scopedTries.interceptMethodCallsInClosure(tryBlock)
+        Closure<? extends Promise>  rescopedTryBlock = scopedTries.interceptMethodCallsInClosure(tryBlock)
         try {
-            result.chain(tryBlock())
+            result.chain(rescopedTryBlock())
         } catch (Exception e) {
+            scopedTries.cancel()
             result.description = "Error in LocalDoTry try: ${e}"
             error = e
         }
@@ -51,6 +54,7 @@ class LocalDoTry implements DoTry {
     }
 
     @Override
+    @SuppressWarnings('CatchException')
     DoTry withCatch(Closure doCatchBlock) {
         if (error) {
             try {

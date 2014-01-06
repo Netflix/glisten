@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.glisten
+package com.netflix.glisten.impl.swf
 
 import com.amazonaws.services.simpleworkflow.flow.ActivitySchedulingOptions
 import com.amazonaws.services.simpleworkflow.flow.DynamicActivitiesClient
@@ -22,6 +22,7 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.Activities
 import com.amazonaws.services.simpleworkflow.flow.annotations.Activity
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.model.ActivityType
+import com.netflix.glisten.impl.ReflectionHelper
 import groovy.transform.Canonical
 import java.lang.reflect.Method
 

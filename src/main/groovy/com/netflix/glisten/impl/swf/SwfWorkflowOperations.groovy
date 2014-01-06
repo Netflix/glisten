@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.glisten
+package com.netflix.glisten.impl.swf
 
 import com.amazonaws.services.simpleworkflow.flow.ActivitySchedulingOptions
 import com.amazonaws.services.simpleworkflow.flow.DecisionContext
@@ -25,6 +25,9 @@ import com.amazonaws.services.simpleworkflow.flow.interceptors.AsyncExecutor
 import com.amazonaws.services.simpleworkflow.flow.interceptors.AsyncRetryingExecutor
 import com.amazonaws.services.simpleworkflow.flow.interceptors.AsyncRunnable
 import com.amazonaws.services.simpleworkflow.flow.interceptors.RetryPolicy
+import com.netflix.glisten.DoTry
+import com.netflix.glisten.impl.PromisingResult
+import com.netflix.glisten.WorkflowOperations
 import groovy.transform.Canonical
 
 /**

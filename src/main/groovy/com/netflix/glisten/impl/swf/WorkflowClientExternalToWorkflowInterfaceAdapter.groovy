@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.glisten
+package com.netflix.glisten.impl.swf
 
 import com.amazonaws.services.simpleworkflow.flow.DynamicWorkflowClientExternal
 import com.amazonaws.services.simpleworkflow.flow.StartWorkflowOptions
 import com.amazonaws.services.simpleworkflow.flow.annotations.Execute
 import com.amazonaws.services.simpleworkflow.flow.annotations.GetState
+import com.netflix.glisten.WorkflowDescriptionTemplate
+import com.netflix.glisten.WorkflowExecutionCreationCallback
+import com.netflix.glisten.WorkflowTags
+import com.netflix.glisten.impl.ReflectionHelper
 import groovy.transform.Canonical
 import java.lang.reflect.Method
 
@@ -27,7 +31,7 @@ import java.lang.reflect.Method
  * Looks like your AWS SWF Flow workflow interface (after a cast) and can actually be used to execute workflows
  * and get the execution state.
  *
- * @see InterfaceBasedWorkflowClient
+ * @see com.netflix.glisten.InterfaceBasedWorkflowClient
  */
 @Canonical
 class WorkflowClientExternalToWorkflowInterfaceAdapter {

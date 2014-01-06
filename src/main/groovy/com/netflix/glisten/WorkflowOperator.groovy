@@ -15,18 +15,15 @@
  */
 package com.netflix.glisten
 
-import com.amazonaws.services.simpleworkflow.model.WorkflowType
-import com.netflix.glisten.example.trip.BayAreaTripWorkflow
-import com.netflix.glisten.impl.WorkflowMetaAttributes
-import spock.lang.Specification
+/**
+ * Specifies that a class has a WorkflowOperations.
+ *
+ * @param < A > The interface for the SWF activities used by this workflow.
+ */
+interface WorkflowOperator<A> {
 
-class WorkflowMetaAttributesSpec extends Specification {
+    WorkflowOperations<A> getWorkflowOperations()
 
-    def 'should get WorkflowType for class'() {
-        WorkflowMetaAttributes workflowMetaAttributes = new WorkflowMetaAttributes(BayAreaTripWorkflow)
-
-        expect:
-        workflowMetaAttributes.workflowType == new WorkflowType(name: 'BayAreaTripWorkflow.start', version: '1.0')
-    }
+    void setWorkflowOperations(WorkflowOperations<A> workflowOperations)
 
 }

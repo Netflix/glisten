@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.glisten
+package com.netflix.glisten.impl.local
 
 import com.amazonaws.services.simpleworkflow.flow.common.FlowDefaults
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.interceptors.RetryPolicy
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.ListeningExecutorService
+import com.netflix.glisten.impl.PromisingResult
 import java.util.concurrent.Callable
 import java.util.concurrent.CancellationException
 
@@ -85,14 +86,14 @@ class LocalRetry<T> extends Promise<T> {
         if (retryPolicy.respondsTo('getMaximumAttempts')) {
             maximumAttempts = retryPolicy.maximumAttempts
         }
-        scopedTries.interceptMethodCallsInClosure(work)
+        Closure<? extends Promise<T>> rescopedWork = scopedTries.interceptMethodCallsInClosure(work)
         try {
-            result.chain(work())
+            result.chain(rescopedWork())
             return result
         } catch (Throwable t) {
             // Retry after first attempt fails.
             Closure<Promise<T>> retryAttempt = {
-                recursingRetry(retryPolicy, work, maximumAttempts, 2, t)
+                recursingRetry(retryPolicy, rescopedWork, maximumAttempts, 2, t)
             }
             if (maximumAttempts > 0) {
                 return retryAttempt()
@@ -129,6 +130,7 @@ class LocalRetry<T> extends Promise<T> {
         boolean abortRetry = lastError instanceof InterruptedException || unretriableError || tooManyAttempts
         if (abortRetry) {
             interrupted = true
+            scopedTries.cancel()
             result.description = "LocalRetry aborted: ${lastError}"
             throw lastError
         }

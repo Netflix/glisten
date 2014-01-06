@@ -13,15 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.glisten
+package com.netflix.glisten.example.edgecases
 
-/**
- * This class with its static fields is an abomination and I would love to remove it. The problem is that I need to
- * provide some information to all SWF workflows. The Flow framework instantiates and executes the workflow without
- * ever giving me access to it. This is the only way I know how to make this state available.
- */
-class GlobalWorkflowAttributes {
-
-    /** SWF taskList that activities will be scheduled with */
-    static String taskList
-}
+enum EdgeCase { WaitForDeadlocks, WaitForScoping, WorkflowMethodCalls, FailedTry, Retry }

@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.glisten
+package com.netflix.glisten.impl.swf
 
 import com.amazonaws.services.simpleworkflow.flow.core.Functor
 import com.amazonaws.services.simpleworkflow.flow.core.Promise
 import com.amazonaws.services.simpleworkflow.flow.core.TryCatchFinally
 import com.google.common.collect.ImmutableSet
+import com.netflix.glisten.DoTry
+import com.netflix.glisten.impl.PromisingResult
 import java.util.concurrent.CancellationException
 
 /**

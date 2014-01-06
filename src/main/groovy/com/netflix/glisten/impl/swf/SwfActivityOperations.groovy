@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.netflix.glisten
+package com.netflix.glisten.impl.swf
 
 import com.amazonaws.services.simpleworkflow.flow.ActivityExecutionContextProvider
 import com.amazonaws.services.simpleworkflow.flow.ActivityExecutionContextProviderImpl
 import com.amazonaws.services.simpleworkflow.model.WorkflowExecution
+import com.netflix.glisten.ActivityOperations
 
 /**
  * SWF specific implementation.
