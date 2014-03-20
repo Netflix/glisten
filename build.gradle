@@ -25,6 +25,25 @@ apply from: file('gradle/check.gradle')
 apply from: file('gradle/license.gradle')
 apply from: file('gradle/release.gradle')
 
+// Added separate integration tests
+// Borrowed technique from http://selimober.com/blog/2014/01/24/separate-unit-and-integration-tests-using-gradle/
+
+// Test Structure
+sourceSets {
+    integTest {
+        java.srcDir file('src/integTest/java')
+        groovy.srcDir file('src/integTest/groovy')
+        resources.srcDir file('src/integTest/resources')
+    }
+}
+
+task integTest(type: Test) {
+    testClassesDir = sourceSets.integTest.output.classesDir
+    classpath = sourceSets.integTest.runtimeClasspath
+}
+
+check.dependsOn integTest
+
 dependencies {
 	compile 'org.codehaus.groovy:groovy-all:2.0.8'
 	compile 'com.amazonaws:aws-java-sdk:1.6.6'
@@ -33,4 +52,9 @@ dependencies {
 
 	testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
 	testCompile 'cglib:cglib-nodep:2.2.2'
+
+    integTestCompile sourceSets.main.output
+    integTestCompile configurations.testCompile
+    integTestCompile sourceSets.test.output
+    integTestRuntime configurations.testRuntime
 }
