@@ -1,11 +1,24 @@
 plugins {
 	id 'nebula.netflixoss' version '2.2.5'
 	id 'groovy'
+	id 'jacoco'
+	id 'codenarc'
 }
 
 // Establish version and status
 ext.githubProjectName = rootProject.name // Change if github project name is not the same as the root project's name
 group = "com.netflix.${githubProjectName}"
+
+codenarcMain {
+    configFile = file('codequality/codenarcMain.groovy')
+}
+codenarcTest {
+    configFile = file('codequality/codenarcTest.groovy')
+}
+codenarc {
+	reportFormat = 'html'
+	toolVersion = '0.22'
+}
 
 repositories {
     jcenter()

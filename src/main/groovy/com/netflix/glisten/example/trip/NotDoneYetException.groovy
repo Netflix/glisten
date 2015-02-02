@@ -16,6 +16,9 @@
 
 package com.netflix.glisten.example.trip
 
+/**
+ * Exception for the example
+ */
 class NotDoneYetException extends RuntimeException {
 
     NotDoneYetException(String message) {

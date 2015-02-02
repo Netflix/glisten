@@ -1,5 +1,3 @@
-import groovy.transform.EqualsAndHashCode
-
 ruleset {
 
     // rulesets/basic.xml

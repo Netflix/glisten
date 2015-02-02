@@ -1,5 +1,3 @@
-import groovy.transform.EqualsAndHashCode
-
 ruleset {
 
     // rulesets/basic.xml
@@ -148,7 +146,6 @@ ruleset {
     BracesForIfElse
     BracesForMethod
     BracesForTryCatchFinally
-    ClassJavadoc
     LineLength
     SpaceAfterCatch
     //SpaceAfterClosingBrace
