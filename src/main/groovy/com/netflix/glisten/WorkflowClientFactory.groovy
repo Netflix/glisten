@@ -30,6 +30,9 @@ import com.amazonaws.services.simpleworkflow.model.WorkflowType
 import com.netflix.glisten.impl.WorkflowMetaAttributes
 import groovy.transform.Canonical
 
+/**
+ * WorkflowClientFactory
+ */
 @Canonical class WorkflowClientFactory {
 
     final AmazonSimpleWorkflow simpleWorkflow

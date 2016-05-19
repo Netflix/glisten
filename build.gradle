@@ -1,29 +1,28 @@
+plugins {
+	id 'nebula.netflixoss' version '2.2.5'
+	id 'groovy'
+	id 'jacoco'
+	id 'codenarc'
+}
+
 // Establish version and status
 ext.githubProjectName = rootProject.name // Change if github project name is not the same as the root project's name
 group = "com.netflix.${githubProjectName}"
 
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral() // maven { url 'http://jcenter.bintray.com' }
-    }
-    apply from: file('gradle/buildscript.gradle'), to: buildscript
+codenarcMain {
+    configFile = file('codequality/codenarcMain.groovy')
+}
+codenarcTest {
+    configFile = file('codequality/codenarcTest.groovy')
+}
+codenarc {
+	reportFormat = 'html'
+	toolVersion = '0.22'
 }
 
-allprojects {
-    repositories {
-        mavenLocal()
-        mavenCentral() // maven { url: 'http://jcenter.bintray.com' }
-    }
+repositories {
+    jcenter()
 }
-
-apply plugin: 'groovy'
-
-apply from: file('gradle/convention.gradle')
-apply from: file('gradle/maven.gradle')
-apply from: file('gradle/check.gradle')
-apply from: file('gradle/license.gradle')
-apply from: file('gradle/release.gradle')
 
 dependencies {
 	compile 'org.codehaus.groovy:groovy-all:2.0.8'
