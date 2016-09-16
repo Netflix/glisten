@@ -110,7 +110,7 @@ class PromisingResult<T> extends Promise<T> {
      */
     static <U> Promise<U> wrapWithPromise(U value) {
         if (value == null) { return new Settable() }
-        (Promise<U>) Promise.isAssignableFrom(value.getClass()) ? value : asPromise(value)
+        (Promise<U>) (Promise.isAssignableFrom(value.getClass()) ? value : asPromise(value))
     }
 
 }
